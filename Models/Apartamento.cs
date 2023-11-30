@@ -7,11 +7,12 @@ namespace CondominusApi.Models
 {
     public class Apartamento
     {
-        public int Id { get; set; }
-        public string Telefone { get; set; }
-        public string Numero { get; set; }
-        public Condominio Condominio { get; set; }
-        public int IdCondominio { get; set; }
-        public List<Entrega> Entregas { get; set; }
+        public int IdApart { get; set; }
+        public string TelefoneApart { get; set; }
+        public string NumeroApart { get; set; }
+        public Condominio CondominioApart { get; set; }
+        public int IdCondominioApart { get; set; }
+        public List<Pessoa> PessoasApart { get; set; }
+        public List<Entrega> EntregasApart { get; set; }
     }
 }

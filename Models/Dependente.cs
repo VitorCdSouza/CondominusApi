@@ -11,6 +11,6 @@ namespace CondominusApi.Models
         public string Nome { get; set; }
         public string Telefone { get; set; }
         public Pessoa Pessoa { get; set; }
-        public int IdPessoa { get; set; }
+        public int IdPessoaDependente { get; set; }
     }
 }

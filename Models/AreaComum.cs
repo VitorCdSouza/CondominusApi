@@ -7,8 +7,8 @@ namespace CondominusApi.Models
 {
     public class AreaComum
     {
-        public int Id { get; set; }
-        public int Capacidade { get; set; }
-        public string Nome { get; set; }
+        public int IdAreaComum { get; set; }
+        public string NomeAreaComum { get; set; }
+        public List<PessoaAreaComum> PessoaACAreaComum { get; set; } 
     }
 }
