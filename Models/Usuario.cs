@@ -13,6 +13,8 @@ namespace CondominusApi.Models
         public byte[]? PasswordHashUsuario { get; set; }
         public byte[]? PasswordSaltUsuario { get; set; }
         public DateTime? DataAcessoUsuario { get; set; }
+        public Pessoa PessoaUsuario { get; set; }
+        public int IdPessoaUsuario { get; set; }
 
         [NotMapped]
         public string TokenUsuario { get; set; }

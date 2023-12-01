@@ -18,60 +18,56 @@ namespace CondominusApi.Data
 
         }
         public DbSet<Apartamento> Apartamentos { get; set; }
-        public DbSet<ApartPessoa> ApartPessoas { get; set; }
         public DbSet<AreaComum> AreasComuns { get; set; }
-        public DbSet<Aviso> Avisos { get; set; }
         public DbSet<Condominio> Condominios { get; set; }
         public DbSet<Dependente> Dependentes { get; set; }
         public DbSet<Entrega> Entregas { get; set; }
+        public DbSet<Notificacao> Notificacoes { get; set; }
         public DbSet<Pessoa> Pessoas { get; set; }
-        public DbSet<Portaria> Portarias { get; set; }
-        public DbSet<Reserva> Reservas { get; set; }
+        public DbSet<PessoaAreaComum> PessoasAreasComuns { get; set; }
+        public DbSet<PessoaNoti> PessoaNotis { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Dependente>()
-            .HasOne(d => d.Pessoa)
-            .WithMany(p => p.Dependentes)
-            .HasForeignKey(d => d.IdPessoa);
+            // declaracao do relacionamento entre pessoa e area comum N para N
+            modelBuilder.Entity<PessoaAreaComum>()
+                .HasKey(pac => new { pac.IdPessoaPessArea, pac.IdAreaComumPessArea });
 
-            modelBuilder.Entity<Apartamento>()
-            .HasOne(a => a.Condominio)
-            .WithMany(c => c.Apartamentos)
-            .HasForeignKey(a => a.IdCondominio);
-
-            modelBuilder.Entity<Entrega>()
-            .HasOne(e => e.Apartamento)
-            .WithMany(a => a.Entregas)
-            .HasForeignKey(e => e.IdApartamento);
 
             modelBuilder.Entity<Condominio>().HasData(
-                new Condominio() { Id = 1, Nome = "Vila Nova Maria", Endereco = "Rua Guaranésia, 1070"},
-                new Condominio() { Id = 2, Nome = "Condomínio Aquarella Pari Colore", Endereco = "Rua Paulo Andrighetti, 1573"},
-                new Condominio() { Id = 3, Nome = "Condomínio Edifício Antônio Walter Santiago", Endereco = "Rua Paulo Andrighetti, 449"},
-                new Condominio() { Id = 4, Nome = "Condomínio Edifício Veneza", Endereco = "Rua Eugênio de Freitas, 525"}
+                new Condominio() { IdCond = 1, NomeCond = "Vila Nova Maria", EnderecoCond = "Rua Guaranésia, 1070", ApartamentosCond = {}},
+                new Condominio() { IdCond = 2, NomeCond = "Condomínio Aquarella Pari Colore", EnderecoCond = "Rua Paulo Andrighetti, 1573"},
+                new Condominio() { IdCond = 3, NomeCond = "Condomínio Edifício Antônio Walter Santiago", EnderecoCond = "Rua Paulo Andrighetti, 449"}
             );
             modelBuilder.Entity<Apartamento>().HasData(
-                new Apartamento() { Id = 1, Telefone = "11912345678", Numero = "A001", IdCondominio = 1 },
-                new Apartamento() { Id = 2, Telefone = "11912345678", Numero = "B002", IdCondominio = 1  },
-                new Apartamento() { Id = 3, Telefone = "11887654321", Numero = "C003", IdCondominio = 1  },
-                new Apartamento() { Id = 4, Telefone = "11955555555", Numero = "E005", IdCondominio = 1  }
+                new Apartamento() { IdApart = 1, TelefoneApart = "11912345678", NumeroApart = "A001", IdCondominioApart = 1 },
+                new Apartamento() { IdApart = 2, TelefoneApart = "11912345678", NumeroApart = "B002", IdCondominioApart = 1  },
+                new Apartamento() { IdApart = 3, TelefoneApart = "11887654321", NumeroApart = "C003", IdCondominioApart = 1  }
             );
-            modelBuilder.Entity<Entrega>().HasData(
-                new Entrega() { Id = 1, Destinatario = "Joao Guilherme", DataEntrega = null, DataRetirada = null, IdApartamento = 1 }
+            modelBuilder.Entity<Entrega>().HasData( // new DateTime(2021, 06, 05, 10, 20, 30) yyyy/MM/dd HH:mm:ss
+                new Entrega() { IdEnt = 1, DestinatarioEnt = "Joao Guilherme", CodEnt = "NBR1354897", DataEntregaEnt = new DateTime(2023, 12, 25, 24, 59, 52), DataRetiradaEnt = new DateTime(2023, 12, 26, 24, 59, 52), IdApartamentoEnt = 1 },
+                new Entrega() { IdEnt = 2, DestinatarioEnt = "Maria Joaquina", CodEnt = "NBR2468135", DataEntregaEnt = new DateTime(2023, 11, 25, 14, 30, 12), DataRetiradaEnt = new DateTime(2023, 11, 26, 14, 30, 12), IdApartamentoEnt = 2 },
+                new Entrega() { IdEnt = 3, DestinatarioEnt = "Ana Clara", CodEnt = "NBR3581415", DataEntregaEnt = new DateTime(2023, 10, 25, 22, 00, 30), DataRetiradaEnt = new DateTime(2023, 10, 26, 22, 00, 30), IdApartamentoEnt = 3 }
+            );
+            modelBuilder.Entity<Pessoa>().HasData( // usuario adicionado depois
+                new Pessoa(){ IdPessoa = 1, NomePessoa = "João Gomes", TelefonePessoa = "11924316523", TipoPessoa = "Sindico", CpfPessoa = "56751898901", IdApartamentoPessoa = 1},
+                new Pessoa(){ IdPessoa = 2, NomePessoa = "Maria Oliveira", TelefonePessoa = "1198254351", TipoPessoa = "Morador", CpfPessoa = "89674156892", IdApartamentoPessoa = 2},
+                new Pessoa(){ IdPessoa = 3, NomePessoa = "João Viana", TelefonePessoa = "11984512345", TipoPessoa = "Morador", CpfPessoa = "32569874561", IdApartamentoPessoa = 3}
+            );
+            // criacao senha para usuarios padroes
+            Criptografia.CriarPasswordHash("123456", out byte[] hash, out byte[] salt);
+            Criptografia.CriarPasswordHash("654321", out byte[] hashJ, out byte[] saltJ);
+
+            modelBuilder.Entity<Usuario>().HasData
+            (
+                new Usuario() { IdUsuario = 1, EmailUsuario = "admin@gmail.com", PasswordHashUsuario = hash, PasswordSaltUsuario = salt, SenhaUsuario = null, IdPessoaUsuario = 1 }
             );
             modelBuilder.Entity<AreaComum>().HasData(
                 new AreaComum() { Id = 1, Capacidade = 50, Nome = "Salão de Festas" },
                 new AreaComum() { Id = 2, Capacidade = 30, Nome = "Churrasqueira" },
                 new AreaComum() { Id = 3, Capacidade = 20, Nome = "Sala de Jogos" },
                 new AreaComum() { Id = 4, Capacidade = 10, Nome = "Piscina" }
-            );
-            modelBuilder.Entity<Pessoa>().HasData(
-                new Pessoa(){ Id = 1, Nome = "João Gomes", Cpf = "56751898901", Telefone = "11924316523"},
-                new Pessoa(){ Id = 2, Nome = "Paola Oliveira", Cpf = "63158658205", Telefone = "11975231678"},
-                new Pessoa(){ Id = 3, Nome = "Marilia Mendonça", Cpf = "27458823908", Telefone = "11937512056"},
-                new Pessoa(){ Id = 4, Nome = "Sorriso Maroto", Cpf = "32152898910", Telefone = "11987618735"}
             );
             modelBuilder.Entity<Reserva>().HasData(
                 new Reserva(){ Id = 1},
@@ -85,30 +81,6 @@ namespace CondominusApi.Data
                 new Dependente() { Id = 3, Nome = "Carlos Oliveira", Telefone = "11234567890", IdPessoa = 2 },
                 new Dependente() { Id = 4, Nome = "Ana Souza", Telefone = "11987654321", IdPessoa = 3 },
                 new Dependente() { Id = 5, Nome = "Pedro Santos", Telefone = "11765432109", IdPessoa = 3 }
-            );
-
-            Usuario user = new Usuario();     
-            Criptografia.CriarPasswordHash("123456", out byte[] hash, out byte[] salt);
-            Criptografia.CriarPasswordHash("654321", out byte[] hashJ, out byte[] saltJ);
-
-            user.Id = 1;
-            user.Nome = "UsuarioAdmin";            
-            user.Perfil = "Admin";
-            user.Email = "admin@gmail.com";
-            user.PasswordHash = hash;
-            user.PasswordSalt = salt;
-            user.PasswordString = string.Empty;
-            user.IdApartamento = 1;
-
-            modelBuilder.Entity<Usuario>().HasData(user);            
-            //Fim da criação do usuário padrão.
-
-            modelBuilder.Entity<Usuario>().HasData
-            (
-                new Usuario() { Id = 3, Nome = "UsuarioSindico", Perfil = "Sindico", Email = "UsuarioSindico@gmail.com", 
-                PasswordHash = hash, PasswordSalt = salt, PasswordString = null, IdApartamento = 2 },
-                new Usuario() { Id = 4, Nome = "UsuarioMorador", Perfil = "Morador", Email = "UsuarioMorador@gmail.com", 
-                PasswordHash = hash, PasswordSalt = salt, PasswordString = null, IdApartamento = 3 }
             );
         }
     }
