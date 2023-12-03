@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace CondominusApi.Models
 {
     public class Entrega
     {
+        [Key]
         public int IdEnt { get; set; }
         public string DestinatarioEnt { get; set; }
         public string CodEnt { get; set; }

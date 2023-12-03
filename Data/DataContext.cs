@@ -36,7 +36,12 @@ namespace CondominusApi.Data
             // declaracao do relacionamento entre pessoa e notificacao N para N
             modelBuilder.Entity<PessoaNoti>()
                 .HasKey(pac => new { pac.IdPessoaPessoaNoti, pac.IdNotificacaoPessoaNoti });
-
+            // declaracao do relacionamento entre pessoa e usuario 1 para 1
+            modelBuilder.Entity<Pessoa>()
+            .HasOne(p => p.UsuarioPessoa)
+            .WithOne(u => u.PessoaUsuario)
+            .HasForeignKey<Usuario>(u => u.IdUsuario)
+            .IsRequired();
 
             modelBuilder.Entity<Condominio>().HasData(
                 new Condominio() { IdCond = 1, NomeCond = "Vila Nova Maria", EnderecoCond = "Rua Guaranésia, 1070", ApartamentosCond = {}},
@@ -49,9 +54,9 @@ namespace CondominusApi.Data
                 new Apartamento() { IdApart = 3, TelefoneApart = "11887654321", NumeroApart = "C003", IdCondominioApart = 1  }
             );
             modelBuilder.Entity<Entrega>().HasData( // new DateTime(2021, 06, 05, 10, 20, 30) yyyy/MM/dd HH:mm:ss
-                new Entrega() { IdEnt = 1, DestinatarioEnt = "Joao Guilherme", CodEnt = "NBR1354897", DataEntregaEnt = new DateTime(2023, 12, 25, 24, 59, 52), DataRetiradaEnt = new DateTime(2023, 12, 26, 24, 59, 52), IdApartamentoEnt = 1 },
-                new Entrega() { IdEnt = 2, DestinatarioEnt = "Maria Joaquina", CodEnt = "NBR2468135", DataEntregaEnt = new DateTime(2023, 11, 25, 14, 30, 12), DataRetiradaEnt = new DateTime(2023, 11, 26, 14, 30, 12), IdApartamentoEnt = 2 },
-                new Entrega() { IdEnt = 3, DestinatarioEnt = "Ana Clara", CodEnt = "NBR3581415", DataEntregaEnt = new DateTime(2023, 10, 25, 22, 00, 30), DataRetiradaEnt = new DateTime(2023, 10, 26, 22, 00, 30), IdApartamentoEnt = 3 }
+                new Entrega() { IdEnt = 1, DestinatarioEnt = "Joao Guilherme", CodEnt = "NBR1354897", DataEntregaEnt = DateTime.Now, DataRetiradaEnt = DateTime.Now.AddDays(1), IdApartamentoEnt = 1 },
+                new Entrega() { IdEnt = 2, DestinatarioEnt = "Maria Joaquina", CodEnt = "NBR2468135", DataEntregaEnt = DateTime.Now, DataRetiradaEnt = DateTime.Now.AddDays(2), IdApartamentoEnt = 2 },
+                new Entrega() { IdEnt = 3, DestinatarioEnt = "Ana Clara", CodEnt = "NBR3581415", DataEntregaEnt = DateTime.Now, DataRetiradaEnt = DateTime.Now.AddDays(1), IdApartamentoEnt = 3 }
             );
             modelBuilder.Entity<Pessoa>().HasData( // usuario adicionado depois
                 new Pessoa(){ IdPessoa = 1, NomePessoa = "João Gomes", TelefonePessoa = "11924316523", TipoPessoa = "Sindico", CpfPessoa = "56751898901", IdApartamentoPessoa = 1},

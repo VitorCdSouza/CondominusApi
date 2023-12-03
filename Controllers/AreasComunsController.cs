@@ -43,7 +43,7 @@ namespace CondominusApi.Controllers
                 await _context.AreasComuns.AddAsync(novaAreaComum);
                 await _context.SaveChangesAsync();
 
-                return Ok(novaAreaComum.Id);
+                return Ok(novaAreaComum.IdAreaComum);
             }
             catch (System.Exception ex)
             {

@@ -21,7 +21,7 @@ namespace CondominusApi.Controllers
             _context = context;
         } 
 
-        //listagem geral de pessoas
+        // listagem geral de pessoas
         [HttpGet("GetAll")]
         public async Task<IActionResult> ListarAsync()
         {
@@ -36,14 +36,14 @@ namespace CondominusApi.Controllers
             }
         }
 
-        //listagem geral de pessoas com dependentes
+        // listagem geral de pessoas com dependentes
         [HttpGet("GetAllDependentes")]
         public async Task<IActionResult> ListarDepAsync()
         {
             try
             {
                 List<Pessoa> pessoas = await _context.Pessoas
-                    .Include(p => p.Dependentes).ToListAsync();
+                    .Include(p => p.DependentesPessoa).ToListAsync();
                 return Ok(pessoas);
             }
             catch (System.Exception ex)
@@ -59,7 +59,7 @@ namespace CondominusApi.Controllers
             try
             {
                 List<Pessoa> pessoas = await _context.Pessoas.ToListAsync();           
-                List<Pessoa> moradores = pessoas.Where(p => p.Perfil == "Morador").ToList();                
+                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Morador").ToList();                
                 return Ok(moradores);     
             }
             catch (System.Exception ex)
@@ -75,7 +75,7 @@ namespace CondominusApi.Controllers
             try
             {
                 List<Pessoa> pessoas = await _context.Pessoas.ToListAsync();           
-                List<Pessoa> sindicos = pessoas.Where(p => p.Perfil == "Sindico").ToList();                
+                List<Pessoa> sindicos = pessoas.Where(p => p.TipoPessoa == "Sindico").ToList();                
                 return Ok(sindicos);     
             }
             catch (System.Exception ex)
@@ -92,7 +92,7 @@ namespace CondominusApi.Controllers
                 await _context.Pessoas.AddAsync(novoPessoa);
                 await _context.SaveChangesAsync();
 
-                return Ok(novoPessoa.Id);
+                return Ok(novoPessoa.IdPessoa);
             }
             catch (System.Exception ex)
             {
@@ -106,20 +106,19 @@ namespace CondominusApi.Controllers
             try
             {
                 Pessoa pessoa = await _context.Pessoas //Busca pessoa no banco através do Id
-                    .FirstOrDefaultAsync(x => x.Id == p.Id);
+                    .FirstOrDefaultAsync(x => x.IdPessoa == p.IdPessoa);
 
-                pessoa.Nome = p.Nome;
-                pessoa.Telefone = p.Telefone;
-                pessoa.Cpf = p.Cpf;
-                pessoa.IdApartamento = p.IdApartamento;
+                pessoa.NomePessoa = p.NomePessoa;
+                pessoa.TelefonePessoa = p.TelefonePessoa;
+                pessoa.CpfPessoa = p.CpfPessoa;
+                pessoa.IdApartamentoPessoa = p.IdApartamentoPessoa;
 
                 var attach = _context.Attach(pessoa);
-                attach.Property(x => x.Id).IsModified = false;
-                attach.Property(x => x.Nome).IsModified = true;
-                attach.Property(x => x.Perfil).IsModified = false;
-                attach.Property(x => x.Telefone).IsModified = true;
-                attach.Property(x => x.Cpf).IsModified = true;
-                attach.Property(x => x.IdApartamento).IsModified = true;
+                attach.Property(x => x.IdPessoa).IsModified = false;
+                attach.Property(x => x.NomePessoa).IsModified = true;
+                attach.Property(x => x.TelefonePessoa).IsModified = true;
+                attach.Property(x => x.CpfPessoa).IsModified = true;
+                attach.Property(x => x.IdApartamentoPessoa).IsModified = true;
                 
                 int linhasAfetadas = await _context.SaveChangesAsync(); //Confirma a alteração no banco
                 return Ok(linhasAfetadas); //Retorna as linhas afetadas (Geralmente sempre 1 linha msm)
@@ -135,7 +134,7 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                Pessoa pRemover = await _context.Pessoas.FirstOrDefaultAsync(p => p.Id == id);
+                Pessoa pRemover = await _context.Pessoas.FirstOrDefaultAsync(p => p.IdPessoa == id);
 
                 _context.Pessoas.Remove(pRemover);
                 int linhaAfetadas = await _context.SaveChangesAsync();

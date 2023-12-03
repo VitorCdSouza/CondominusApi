@@ -40,7 +40,7 @@ namespace CondominusApi.Controllers
                 await _context.Condominios.AddAsync(novoCondominio);
                 await _context.SaveChangesAsync();
 
-                return Ok(novoCondominio.Id);
+                return Ok(novoCondominio.IdCond);
             }
             catch (System.Exception ex)
             {

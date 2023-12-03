@@ -40,14 +40,10 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                Apartamento ap = await _context.Apartamentos 
-                    .FirstOrDefaultAsync(x => x.Id == novaEntrega.IdApartamento);
-
-                novaEntrega.Apartamento = ap;
                 await _context.Entregas.AddAsync(novaEntrega);
                 await _context.SaveChangesAsync();
 
-                return Ok(novaEntrega.Id);
+                return Ok(novaEntrega.IdEnt);
             }
             catch (System.Exception ex)
             {

@@ -29,7 +29,7 @@ namespace CondominusApi.Controllers
 
         private string CriarToken(Usuario usuario)
         {
-            List<Claim> claims = new List<Claim>
+            List<Claim> claims = new List<Claim> // informacoes que aparecerao no token
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Name, usuario.EmailUsuario),
@@ -49,66 +49,52 @@ namespace CondominusApi.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        [HttpPost("GetUser")]
-        public async Task<IActionResult> Get(Usuario u)
-        {
-            try
-            {
-                Usuario uRetornado = await _context.Usuarios
-                    .FirstOrDefaultAsync(x => x.Nome == u.Nome && u.Email == u.Email);
-
-                if (uRetornado == null)
-                    throw new Exception("Usuário não encontrado");
-
-                return Ok(uRetornado);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpGet("GetAll")]
         public async Task<IActionResult> Get()
         {
             try
             {
-                List<Usuario> lista = await _context.Usuarios.ToListAsync();
-                List<Usuario> usuariosMoradores = await _context.Usuarios.Where(u => u.Perfil == "Morador").ToListAsync();
+                List<Usuario> lista = await _context.Usuarios.Include(r => r.PessoaUsuario).ToListAsync();
+                List<Usuario> usuariosMoradores = await _context.Usuarios.Where(u => u.PessoaUsuario.TipoPessoa == "Morador").ToListAsync();
                 List<UsuarioDTO> usuariosRetorno = new List<UsuarioDTO>();
                 foreach (Usuario u in usuariosMoradores){
                     UsuarioDTO usuarioDTO = new UsuarioDTO{
-                        Id = u.Id,
-                        Nome = u.Nome,
-                        Telefone = u.Telefone,
-                        Cpf = u.Cpf,
-                        Perfil = u.Perfil,
-                        Email = u.Email,
-                        DataAcesso = u.DataAcesso,
-                        Apartamento = u.Apartamento,
-                        IdApartamento = u.IdApartamento
+                        IdUsuarioDTO = u.IdUsuario,
+                        EmailUsuarioDTO = u.EmailUsuario,
+                        DataAcessoUsuarioDTO = u.DataAcessoUsuario,
+                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa   
                     };
                     usuariosRetorno.Add(usuarioDTO);
                 }
                 return Ok(usuariosRetorno);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        private async Task<bool> UsuarioExistente(string username)
+        private async Task<bool> UsuarioExistente(string email)
         {
-            if (await _context.Usuarios.AnyAsync(x => x.Nome.ToLower() == username.ToLower()))
+            if (await _context.Usuarios.AnyAsync(x => x.EmailUsuario.ToLower() == email.ToLower()))
             {
                 return true;
             }
             return false;
         }
-        private async Task<bool> ApartamentoExistente(int ap)
+        private async Task<bool> UsuarioPessoaExistente(string cpf)
         {
-            if (await _context.Usuarios.AnyAsync(x => x.IdApartamento == ap))
+            Pessoa pessoa = await _context.Pessoas 
+                    .FirstOrDefaultAsync(x => x.CpfPessoa == cpf);
+            if (pessoa.UsuarioPessoa == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        private async Task<bool> PessoaPreviamenteCadastrada(string cpf)
+        {
+            if (await _context.Pessoas.AnyAsync(x => x.CpfPessoa == cpf))
             {
                 return true;
             }
@@ -117,115 +103,76 @@ namespace CondominusApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("Registrar")]
-        public async Task<IActionResult> RegistrarUsuario(Usuario user)
+        public async Task<IActionResult> RegistrarUsuario([FromQuery] string cpf, [FromBody] Usuario usuario)
         {
             try
             {
-                if (await UsuarioExistente(user.Email))
-                    throw new System.Exception("E-mail já cadastrado.");
-                if (await ApartamentoExistente(user.IdApartamento))
-                    throw new System.Exception("Apartamento já cadastrado.");
+                if (await UsuarioExistente(usuario.EmailUsuario))
+                    throw new Exception("E-mail já cadastrado.");
+                if (await UsuarioPessoaExistente(cpf))
+                    throw new Exception("Pessoa já possui cadastro.");
+                if (!await PessoaPreviamenteCadastrada(cpf))
+                    throw new Exception("Pessoa não cadastrada pelo síndico.");
 
-                Apartamento ap = await _context.Apartamentos 
-                    .FirstOrDefaultAsync(x => x.Id == user.IdApartamento);
-                user.Apartamento = ap;
+                Pessoa pessoa = await _context.Pessoas 
+                    .FirstOrDefaultAsync(x => x.CpfPessoa == cpf);
+
+                Criptografia.CriarPasswordHash(usuario.SenhaUsuario, out byte[] hash, out byte[] salt);
+                usuario.SenhaUsuario = string.Empty;
+                usuario.PasswordHashUsuario = hash;
+                usuario.PasswordSaltUsuario = salt;
+
+                usuario.IdPessoaUsuario = pessoa.IdPessoa;
+                usuario.PessoaUsuario = pessoa;
+
                 
-                Criptografia.CriarPasswordHash(user.PasswordString, out byte[] hash, out byte[] salt);
-                user.PasswordString = string.Empty;
-                user.PasswordHash = hash;
-                user.PasswordSalt = salt;
-                await _context.Usuarios.AddAsync(user);
-                
-                Pessoa pessoa = new Pessoa
-                {
-                    Nome = user.Nome,
-                    Perfil = user.Perfil,
-                    Telefone = user.Telefone,
-                    Cpf = user.Cpf,
-                    Apartamento = ap,
-                    IdApartamento = user.IdApartamento
-                };
-                await _context.Pessoas.AddAsync(pessoa);
+                await _context.Usuarios.AddAsync(usuario);
+
+                pessoa.IdUsuarioPessoa = usuario.IdUsuario;
+
+                _context.Attach(pessoa).Property(x => x.IdUsuarioPessoa).IsModified = true;
+
                 await _context.SaveChangesAsync();
 
-                return Ok(user.Id);
+                return Ok(usuario.IdUsuario);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        /* eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwidW5pcXVlX25hbWUiOiJVc3VhcmlvQWRtaW4iLCJuYmYiOjE2OTMyMjQ0NjAsImV4cCI6MTY5MzMxMDg2MCwiaWF0IjoxNjkzMjI0NDYwfQ.tfzKDR22gQ7K60A5Sj0hf5_v9spygsgfGQ4mPeLYxTqYRpKRPeijMtGjGMrI9LhOgAoHdLlFDbABWjdzB2uq0Q*/
         [AllowAnonymous]
         [HttpPost("Autenticar")]
         public async Task<IActionResult> AutenticarUsuario(Usuario credenciais)
         {
             try
             {
-                Usuario usuario = await _context.Usuarios
-                   .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(credenciais.Email.ToLower()));
+                Usuario usuario = await _context.Usuarios.Include(r => r.PessoaUsuario)
+                   .FirstOrDefaultAsync(x => x.EmailUsuario == credenciais.EmailUsuario);
 
                 if (usuario == null)
-                    throw new System.Exception("Usuário não encontrado.");
-                else if (!Criptografia.VerificarPasswordHash(credenciais.PasswordString, usuario.PasswordHash, usuario.PasswordSalt))
-                    throw new System.Exception("Senha incorreta.");
+                    throw new Exception("Usuário não encontrado.");
+                else if (!Criptografia.VerificarPasswordHash(credenciais.SenhaUsuario, usuario.PasswordHashUsuario, usuario.PasswordSaltUsuario))
+                    throw new Exception("Senha incorreta.");
                 else
                 {
-                    usuario.DataAcesso = System.DateTime.Now;
+                    usuario.DataAcessoUsuario = DateTime.Now;
                     _context.Usuarios.Update(usuario);
-                    await _context.SaveChangesAsync(); //Confirma a alteração no banco
+                    await _context.SaveChangesAsync();
 
-                    usuario.PasswordHash = null;
-                    usuario.PasswordSalt = null;
-                    usuario.Token = CriarToken(usuario);
+                    usuario.PasswordHashUsuario = null;
+                    usuario.PasswordSaltUsuario = null;
+                    usuario.TokenUsuario = CriarToken(usuario);
 
                     return Ok(usuario);
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpGet("{usuarioId}")]
-        public async Task<IActionResult> GetUsuario(int usuarioId)
-        {
-            try
-            {
-                //List exigirá o using System.Collections.Generic
-                Usuario usuario = await _context.Usuarios //Busca o usuário no banco através do Id
-                    .FirstOrDefaultAsync(x => x.Id == usuarioId);
-                return Ok(usuario);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // [HttpPost("DeletarMuitos")]
-        // public async Task<IActionResult> DeletarUsuarios([FromBody] int[] ids)
-        // {
-        //     try
-        //     {
-        //         if (ids.Length < 1)
-        //             throw new Exception("Selecione usuarios");
-
-        //         foreach (int i in ids) {
-        //             Usuario usuarioParaDeletar = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == i);
-        //             _context.Usuarios.Remove(usuarioParaDeletar);
-        //         }
-                
-        //         int linhaAfetadas = await _context.SaveChangesAsync();
-        //         return Ok(linhaAfetadas);
-        //     }
-        //     catch (System.Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
 
         [HttpPost("DeletarMuitos")]
         public async Task<IActionResult> DeletarUsuarios([FromBody] int[] ids)
@@ -237,9 +184,8 @@ namespace CondominusApi.Controllers
                     throw new Exception("Selecione usuários para deletar.");
                 }
 
-                // Filtrar apenas IDs válidos e existentes no banco de dados
                 var usuariosParaDeletar = await _context.Usuarios
-                    .Where(u => ids.Contains(u.Id))
+                    .Where(u => ids.Contains(u.IdUsuario))
                     .ToListAsync();
 
                 if (usuariosParaDeletar.Count == 0)
@@ -259,42 +205,23 @@ namespace CondominusApi.Controllers
             }
         }
 
-        //Método para alteração do e-mail
         [HttpPut("AtualizarUsuario")]
         public async Task<IActionResult> AtualizarUsuario(Usuario u)
         {
             try
             {
-                if (await ApartamentoExistente(u.IdApartamento))
-                    throw new System.Exception("Apartamento já cadastrado.");
+                Usuario usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(x => x.IdUsuario == u.IdUsuario);
 
-                Usuario usuario = await _context.Usuarios //Busca o usuário no banco através do Id
-                    .FirstOrDefaultAsync(x => x.Id == u.Id);
-                Pessoa pessoa = await _context.Pessoas //Busca o usuário no banco através do Id
-                    .FirstOrDefaultAsync(x => x.Id == u.Id);
-                Apartamento ap = await _context.Apartamentos 
-                    .FirstOrDefaultAsync(x => x.Id == u.IdApartamento);
-
-                usuario.Nome = u.Nome;
-                usuario.Telefone = u.Telefone;
-                usuario.Cpf = u.Cpf;
-                usuario.Apartamento = ap;
-                usuario.IdApartamento = u.IdApartamento;
-                usuario.Email = u.Email;
-
-                pessoa.Telefone = u.Telefone;
-                pessoa.Nome = u.Nome;
-                pessoa.Cpf = u.Cpf;
-                pessoa.Apartamento = ap;
-                pessoa.IdApartamento = u.IdApartamento;
+                usuario.EmailUsuario = u.EmailUsuario;
 
                 var attach = _context.Attach(usuario);
-                attach.Property(x => x.Id).IsModified = false;
-                attach.Property(x => x.Email).IsModified = true;
-                int linhasAfetadas = await _context.SaveChangesAsync(); //Confirma a alteração no banco
-                return Ok(linhasAfetadas); //Retorna as linhas afetadas (Geralmente sempre 1 linha msm)
+                attach.Property(x => x.IdUsuario).IsModified = false;
+                attach.Property(x => x.EmailUsuario).IsModified = true;
+                int linhasAfetadas = await _context.SaveChangesAsync(); // confirma a alteração no banco
+                return Ok(linhasAfetadas);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

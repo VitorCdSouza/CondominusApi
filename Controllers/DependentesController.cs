@@ -48,7 +48,7 @@ namespace CondominusApi.Controllers
                 await _context.Dependentes.AddAsync(novoDependente);
                 await _context.SaveChangesAsync();
 
-                return Ok(novoDependente.Id);
+                return Ok(novoDependente.IdDependente);
             }
             catch (System.Exception ex)
             {
