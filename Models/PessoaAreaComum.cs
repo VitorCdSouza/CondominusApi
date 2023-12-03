@@ -8,7 +8,8 @@ namespace CondominusApi.Models
     public class PessoaAreaComum
     {
         public int IdPessArea { get; set; }
-        public DateTime dataHoraPessArea { get; set; }
+        public DateTime dataHoraInicioPessArea { get; set; } // data e hora do inicio de area comum
+        public DateTime dataHoraFimPessArea { get; set; } // data e hora do fim de area comum
         public Pessoa PessoaPessArea { get; set; }
         public int IdPessoaPessArea { get; set; }
         public AreaComum AreaComumPessArea { get; set; }

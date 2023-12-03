@@ -31,9 +31,9 @@ namespace CondominusApi.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Nome),
-                new Claim(ClaimTypes.Role, usuario.Perfil)
+                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                new Claim(ClaimTypes.Name, usuario.EmailUsuario),
+                new Claim(ClaimTypes.Role, usuario.PessoaUsuario.TipoPessoa)
             };
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration
             .GetSection("ConfiguracaoToken:Chave").Value));
@@ -41,7 +41,7 @@ namespace CondominusApi.Controllers
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = null,
                 SigningCredentials = creds
             };
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();

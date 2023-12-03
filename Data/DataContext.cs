@@ -33,6 +33,9 @@ namespace CondominusApi.Data
             // declaracao do relacionamento entre pessoa e area comum N para N
             modelBuilder.Entity<PessoaAreaComum>()
                 .HasKey(pac => new { pac.IdPessoaPessArea, pac.IdAreaComumPessArea });
+            // declaracao do relacionamento entre pessoa e notificacao N para N
+            modelBuilder.Entity<PessoaNoti>()
+                .HasKey(pac => new { pac.IdPessoaPessoaNoti, pac.IdNotificacaoPessoaNoti });
 
 
             modelBuilder.Entity<Condominio>().HasData(
@@ -63,24 +66,31 @@ namespace CondominusApi.Data
             (
                 new Usuario() { IdUsuario = 1, EmailUsuario = "admin@gmail.com", PasswordHashUsuario = hash, PasswordSaltUsuario = salt, SenhaUsuario = null, IdPessoaUsuario = 1 }
             );
+            
             modelBuilder.Entity<AreaComum>().HasData(
-                new AreaComum() { Id = 1, Capacidade = 50, Nome = "Salão de Festas" },
-                new AreaComum() { Id = 2, Capacidade = 30, Nome = "Churrasqueira" },
-                new AreaComum() { Id = 3, Capacidade = 20, Nome = "Sala de Jogos" },
-                new AreaComum() { Id = 4, Capacidade = 10, Nome = "Piscina" }
+                new AreaComum() { IdAreaComum = 1, NomeAreaComum = "Churrasqueira" },
+                new AreaComum() { IdAreaComum = 2, NomeAreaComum = "Salão de Jogos" },
+                new AreaComum() { IdAreaComum = 3, NomeAreaComum = "Quadra" }
             );
-            modelBuilder.Entity<Reserva>().HasData(
-                new Reserva(){ Id = 1},
-                new Reserva(){ Id = 2},
-                new Reserva(){ Id = 3},
-                new Reserva(){ Id = 4}
+            modelBuilder.Entity<PessoaAreaComum>().HasData(
+                new PessoaAreaComum() { IdPessArea = 1, dataHoraInicioPessArea = new DateTime(2023, 12, 05, 15, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 05, 18, 00, 00), IdPessoaPessArea = 1, IdAreaComumPessArea = 1 },
+                new PessoaAreaComum() { IdPessArea = 2, dataHoraInicioPessArea = new DateTime(2023, 12, 06, 13, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 06, 16, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 1 },
+                new PessoaAreaComum() { IdPessArea = 2, dataHoraInicioPessArea = new DateTime(2023, 12, 16, 18, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 16, 21, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 2 }
             );
+
+            modelBuilder.Entity<Notificacao>().HasData(
+                new Notificacao() { IdNotificacao = 1, AssuntoNotificacao = "Manutenção elétrica", MensagemNotificacao = "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas",  DataEnvioNotificacao = new DateTime(2023, 12, 06, 09, 13, 22)}
+            );
+            modelBuilder.Entity<PessoaNoti>().HasData(
+                new PessoaNoti() { IdPessoaNoti = 1, IdPessoaPessoaNoti = 1, IdNotificacaoPessoaNoti = 1 }
+            );
+
             modelBuilder.Entity<Dependente>().HasData(
-                new Dependente() { Id = 1, Nome = "João Gomes", Telefone = "11924316523", IdPessoa = 1},
-                new Dependente() { Id = 2, Nome = "Maria Silva", Telefone = "11876543210", IdPessoa = 1 },
-                new Dependente() { Id = 3, Nome = "Carlos Oliveira", Telefone = "11234567890", IdPessoa = 2 },
-                new Dependente() { Id = 4, Nome = "Ana Souza", Telefone = "11987654321", IdPessoa = 3 },
-                new Dependente() { Id = 5, Nome = "Pedro Santos", Telefone = "11765432109", IdPessoa = 3 }
+                new Dependente() { IdDependente = 1, NomeDependente = "João Gomes", CpfDependente = "11242100083", IdPessoaDependente = 1},
+                new Dependente() { IdDependente = 2, NomeDependente = "Maria Silva", CpfDependente = "30777454025", IdPessoaDependente = 1 },
+                new Dependente() { IdDependente = 3, NomeDependente = "Carlos Oliveira", CpfDependente = "53086593032", IdPessoaDependente = 2 },
+                new Dependente() { IdDependente = 4, NomeDependente = "Ana Souza", CpfDependente = "54710630070", IdPessoaDependente = 3 },
+                new Dependente() { IdDependente = 5, NomeDependente = "Pedro Santos", CpfDependente = "03940474002", IdPessoaDependente = 3 }
             );
         }
     }

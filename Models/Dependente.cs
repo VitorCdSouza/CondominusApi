@@ -7,10 +7,10 @@ namespace CondominusApi.Models
 {
     public class Dependente
     {
-        public int Id { get; set; }
-        public string Nome { get; set; }
-        public string Telefone { get; set; }
-        public Pessoa Pessoa { get; set; }
+        public int IdDependente { get; set; }
+        public string NomeDependente { get; set; }
+        public string CpfDependente { get; set; }
+        public Pessoa PessoaDependente { get; set; }
         public int IdPessoaDependente { get; set; }
     }
 }
