@@ -210,9 +210,6 @@ namespace CondominusApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdEnt"));
 
-                    b.Property<int?>("ApartamentoEntIdApart")
-                        .HasColumnType("int");
-
                     b.Property<string>("CodEnt")
                         .HasColumnType("nvarchar(max)");
 
@@ -230,7 +227,7 @@ namespace CondominusApi.Migrations
 
                     b.HasKey("IdEnt");
 
-                    b.HasIndex("ApartamentoEntIdApart");
+                    b.HasIndex("IdApartamentoEnt");
 
                     b.ToTable("Entregas");
 
@@ -239,8 +236,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 1,
                             CodEnt = "NBR1354897",
-                            DataEntregaEnt = new DateTime(2023, 12, 3, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1169),
-                            DataRetiradaEnt = new DateTime(2023, 12, 4, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1182),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8709),
+                            DataRetiradaEnt = new DateTime(2023, 12, 5, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8724),
                             DestinatarioEnt = "Joao Guilherme",
                             IdApartamentoEnt = 1
                         },
@@ -248,8 +245,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 2,
                             CodEnt = "NBR2468135",
-                            DataEntregaEnt = new DateTime(2023, 12, 3, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1188),
-                            DataRetiradaEnt = new DateTime(2023, 12, 5, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1189),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8730),
+                            DataRetiradaEnt = new DateTime(2023, 12, 6, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8731),
                             DestinatarioEnt = "Maria Joaquina",
                             IdApartamentoEnt = 2
                         },
@@ -257,8 +254,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 3,
                             CodEnt = "NBR3581415",
-                            DataEntregaEnt = new DateTime(2023, 12, 3, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1190),
-                            DataRetiradaEnt = new DateTime(2023, 12, 4, 23, 9, 24, 914, DateTimeKind.Local).AddTicks(1191),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8733),
+                            DataRetiradaEnt = new DateTime(2023, 12, 5, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8733),
                             DestinatarioEnt = "Ana Clara",
                             IdApartamentoEnt = 3
                         });
@@ -284,12 +281,7 @@ namespace CondominusApi.Migrations
                     b.Property<string>("MensagemNotificacao")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PessoaNotificacaoIdPessoa")
-                        .HasColumnType("int");
-
                     b.HasKey("IdNotificacao");
-
-                    b.HasIndex("PessoaNotificacaoIdPessoa");
 
                     b.ToTable("Notificacoes");
 
@@ -404,17 +396,9 @@ namespace CondominusApi.Migrations
                     b.Property<int>("IdPessoaNoti")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NotificacaoPessoaNotiIdNotificacao")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PessoaPessoaNotiIdPessoa")
-                        .HasColumnType("int");
-
                     b.HasKey("IdPessoaPessoaNoti", "IdNotificacaoPessoaNoti");
 
-                    b.HasIndex("NotificacaoPessoaNotiIdNotificacao");
-
-                    b.HasIndex("PessoaPessoaNotiIdPessoa");
+                    b.HasIndex("IdNotificacaoPessoaNoti");
 
                     b.ToTable("PessoaNotis");
 
@@ -457,8 +441,8 @@ namespace CondominusApi.Migrations
                             IdUsuario = 1,
                             EmailUsuario = "admin@gmail.com",
                             IdPessoaUsuario = 1,
-                            PasswordHashUsuario = new byte[] { 31, 185, 69, 48, 152, 106, 69, 25, 100, 159, 118, 44, 102, 192, 214, 240, 4, 23, 193, 81, 147, 116, 83, 99, 0, 169, 229, 141, 134, 146, 179, 46, 117, 160, 107, 32, 102, 121, 192, 158, 4, 173, 178, 81, 42, 80, 58, 36, 177, 46, 99, 176, 152, 69, 255, 16, 29, 104, 12, 113, 0, 36, 254, 53 },
-                            PasswordSaltUsuario = new byte[] { 59, 24, 107, 168, 252, 120, 28, 218, 22, 235, 63, 31, 30, 121, 3, 94, 161, 30, 191, 168, 250, 122, 254, 152, 245, 56, 143, 204, 48, 231, 249, 189, 16, 64, 211, 83, 28, 238, 34, 66, 33, 208, 203, 87, 221, 128, 102, 193, 154, 228, 71, 17, 102, 105, 49, 25, 70, 16, 18, 190, 228, 47, 207, 102, 37, 251, 108, 229, 208, 55, 79, 21, 215, 223, 177, 14, 242, 168, 72, 203, 72, 67, 54, 115, 131, 1, 23, 145, 3, 210, 1, 116, 27, 13, 228, 219, 133, 170, 51, 5, 182, 207, 220, 19, 77, 100, 210, 121, 15, 226, 133, 240, 86, 172, 108, 172, 154, 211, 52, 205, 87, 86, 62, 255, 42, 166, 247, 60 }
+                            PasswordHashUsuario = new byte[] { 232, 179, 122, 22, 7, 112, 236, 81, 30, 170, 55, 87, 242, 122, 254, 225, 112, 228, 182, 122, 75, 202, 100, 241, 248, 152, 74, 20, 21, 136, 26, 43, 116, 85, 204, 201, 101, 192, 106, 53, 116, 223, 60, 89, 63, 244, 160, 9, 37, 34, 41, 76, 228, 153, 39, 47, 215, 103, 188, 22, 2, 185, 104, 44 },
+                            PasswordSaltUsuario = new byte[] { 195, 120, 245, 121, 241, 22, 63, 75, 234, 191, 11, 87, 14, 91, 81, 186, 161, 55, 199, 241, 62, 29, 67, 132, 118, 102, 40, 177, 67, 158, 211, 36, 26, 136, 194, 131, 253, 247, 39, 22, 230, 115, 113, 201, 231, 113, 113, 195, 230, 120, 65, 43, 118, 197, 52, 13, 218, 81, 24, 87, 86, 50, 42, 36, 229, 98, 217, 224, 20, 222, 68, 192, 95, 80, 24, 91, 100, 135, 225, 9, 61, 209, 124, 144, 208, 175, 124, 14, 168, 194, 35, 181, 6, 35, 160, 180, 82, 95, 177, 22, 167, 61, 86, 73, 212, 101, 35, 226, 191, 225, 43, 245, 24, 98, 101, 78, 163, 84, 38, 66, 181, 154, 41, 148, 99, 161, 85, 170 }
                         });
                 });
 
@@ -488,18 +472,11 @@ namespace CondominusApi.Migrations
                 {
                     b.HasOne("CondominusApi.Models.Apartamento", "ApartamentoEnt")
                         .WithMany("EntregasApart")
-                        .HasForeignKey("ApartamentoEntIdApart");
+                        .HasForeignKey("IdApartamentoEnt")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApartamentoEnt");
-                });
-
-            modelBuilder.Entity("CondominusApi.Models.Notificacao", b =>
-                {
-                    b.HasOne("CondominusApi.Models.Pessoa", "PessoaNotificacao")
-                        .WithMany()
-                        .HasForeignKey("PessoaNotificacaoIdPessoa");
-
-                    b.Navigation("PessoaNotificacao");
                 });
 
             modelBuilder.Entity("CondominusApi.Models.Pessoa", b =>
@@ -535,12 +512,16 @@ namespace CondominusApi.Migrations
             modelBuilder.Entity("CondominusApi.Models.PessoaNoti", b =>
                 {
                     b.HasOne("CondominusApi.Models.Notificacao", "NotificacaoPessoaNoti")
-                        .WithMany()
-                        .HasForeignKey("NotificacaoPessoaNotiIdNotificacao");
+                        .WithMany("PessoasNotificacoes")
+                        .HasForeignKey("IdNotificacaoPessoaNoti")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CondominusApi.Models.Pessoa", "PessoaPessoaNoti")
                         .WithMany("PessoaNotiPessoa")
-                        .HasForeignKey("PessoaPessoaNotiIdPessoa");
+                        .HasForeignKey("IdPessoaPessoaNoti")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("NotificacaoPessoaNoti");
 
@@ -573,6 +554,11 @@ namespace CondominusApi.Migrations
             modelBuilder.Entity("CondominusApi.Models.Condominio", b =>
                 {
                     b.Navigation("ApartamentosCond");
+                });
+
+            modelBuilder.Entity("CondominusApi.Models.Notificacao", b =>
+                {
+                    b.Navigation("PessoasNotificacoes");
                 });
 
             modelBuilder.Entity("CondominusApi.Models.Pessoa", b =>

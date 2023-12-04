@@ -9,3 +9,14 @@ Terminar controller:
 Adicionar Verificacoes para adicionar PessoaAreaComum
 
 Testar e documentar Update e Delete de PessoasAreasComunsController
+
+Alterar Gets para filtrarem por Condominio:
+    Apartamento - ok
+    AreasComuns - ok
+    Dependentes - ok
+    Entregas - ok
+    Notificacoes - ok
+    Pessoas (Moradores) - ok - rota diferente
+    PessoasAreasComuns - ok
+    PessoasNotis -fds
+    Usuarios - ok

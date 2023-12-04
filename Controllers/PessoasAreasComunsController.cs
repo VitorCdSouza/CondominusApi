@@ -6,6 +6,7 @@ using CondominusApi.Data;
 using CondominusApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using CondominusApi.Utils;
 
 namespace CondominusApi.Controllers
 {
@@ -32,6 +33,41 @@ namespace CondominusApi.Controllers
                 .Include(ac => ac.AreaComumPessArea)
                 .ToListAsync();                
                 return Ok(pessoasAreasComuns);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetAllCondominio")]
+        public async Task<IActionResult> ListarPorCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<PessoaAreaComum> pessoasAreasComuns = await _context.PessoasAreasComuns
+                .Include(x => x.AreaComumPessArea)
+                .Include(x => x.PessoaPessArea)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .ToListAsync();
+                
+                List<PessoaAreaComumDTO> pessoasAreasComunsRetorno = new List<PessoaAreaComumDTO>();
+                foreach (PessoaAreaComum x in pessoasAreasComuns){
+                    PessoaAreaComumDTO pessoaAreaComumDTO = new PessoaAreaComumDTO{
+                        IdPessAreaDTO = x.IdPessoaPessArea,
+                        NomeAreaPessAreaDTO = x.AreaComumPessArea.NomeAreaComum,   
+                        dataHoraInicioPessAreaDTO = x.dataHoraInicioPessArea,
+                        dataHoraFimPessAreaDTO = x.dataHoraFimPessArea,
+                        NomePessoaDTO = x.PessoaPessArea.NomePessoa
+                    };
+                    pessoasAreasComunsRetorno.Add(pessoaAreaComumDTO);
+                }
+
+                return Ok(pessoasAreasComunsRetorno);
             }
             catch (Exception ex)
             {

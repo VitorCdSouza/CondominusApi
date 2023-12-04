@@ -6,6 +6,7 @@ using CondominusApi.Data;
 using CondominusApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using CondominusApi.Utils;
 
 namespace CondominusApi.Controllers
 {
@@ -41,6 +42,39 @@ namespace CondominusApi.Controllers
                 return Ok(dependenteRetorno);
             }
             catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetAllCondominio")]
+        public async Task<IActionResult> ListarPorCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Dependente> dependentes = await _context.Dependentes
+                .Include(x => x.PessoaDependente)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.PessoaDependente.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .ToListAsync();
+                
+                List<DependenteDTO> dependentesRetorno = new List<DependenteDTO>();
+                foreach (Dependente x in dependentes){
+                    DependenteDTO dependenteDTO = new DependenteDTO{
+                        IdDependenteDTO = x.IdDependente,
+                        NomeDependenteDTO = x.NomeDependente,
+                        CpfDependenteDTO = x.CpfDependente,
+                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa
+                    };
+                    dependentesRetorno.Add(dependenteDTO);
+                }
+
+                return Ok(dependentesRetorno);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

@@ -6,6 +6,7 @@ using CondominusApi.Data;
 using CondominusApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using CondominusApi.Utils;
 
 namespace CondominusApi.Controllers
 {
@@ -30,6 +31,26 @@ namespace CondominusApi.Controllers
                 return Ok(areasComuns);
             }
             catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetAllCondominio")]
+        public async Task<IActionResult> ListarPorCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                var areasComuns = _context.AreasComuns
+                .Where(ac => ac.PessoaACAreaComum
+                    .Any(pa => pa.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken))
+                .ToListAsync();
+
+                return Ok(areasComuns);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

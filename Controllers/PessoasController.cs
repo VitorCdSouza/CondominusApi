@@ -6,6 +6,7 @@ using CondominusApi.Data;
 using CondominusApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using CondominusApi.Utils;
 
 namespace CondominusApi.Controllers
 {
@@ -72,6 +73,40 @@ namespace CondominusApi.Controllers
                     };
                     pessoasRetorno.Add(pessoaDTO);
                 }
+                return Ok(pessoasRetorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetMoradoresCondominio")]
+        public async Task<IActionResult> ListarPorCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Pessoa> pessoas = await _context.Pessoas
+                .Include(a => a.ApartamentoPessoa)
+                .ThenInclude(c => c.CondominioApart)
+                .Where(p => p.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .Where(p => p.TipoPessoa == "Morador")
+                .ToListAsync();      
+                
+                List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
+                foreach (Pessoa p in pessoas){
+                    PessoaDTO pessoaDTO = new PessoaDTO{
+                        IdPessoaDTO = p.IdPessoa,
+                        NomePessoaDTO = p.NomePessoa,
+                        TelefonePessoaDTO = p.TelefonePessoa,
+                        CpfPessoaDTO = p.CpfPessoa,
+                        NumeroApartPessoaDTO = p.ApartamentoPessoa.NumeroApart
+                    };
+                    pessoasRetorno.Add(pessoaDTO);
+                }
+
                 return Ok(pessoasRetorno);
             }
             catch (Exception ex)

@@ -34,7 +34,7 @@ namespace CondominusApi.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Email, usuario.EmailUsuario),
                 new Claim(ClaimTypes.Role, usuario.PessoaUsuario.TipoPessoa),
-                new Claim(ClaimTypes.Actor, numeroCond)
+                new Claim(JwtRegisteredClaimNames.Sub, numeroCond)
             };
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration
             .GetSection("ConfiguracaoToken:Chave").Value));
@@ -67,6 +67,40 @@ namespace CondominusApi.Controllers
                     };
                     usuariosRetorno.Add(usuarioDTO);
                 }
+                return Ok(usuariosRetorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetAllCondominio")]
+        public async Task<IActionResult> ListarPorCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Usuario> usuariosMoradores = await _context.Usuarios
+                .Include(x => x.PessoaUsuario)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(u => u.PessoaUsuario.TipoPessoa == "Morador")
+                .Where(x => x.PessoaUsuario.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .ToListAsync();
+                
+                List<UsuarioDTO> usuariosRetorno = new List<UsuarioDTO>();
+                foreach (Usuario u in usuariosMoradores){
+                    UsuarioDTO usuarioDTO = new UsuarioDTO{
+                        IdUsuarioDTO = u.IdUsuario,
+                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa,   
+                        EmailUsuarioDTO = u.EmailUsuario,
+                        DataAcessoUsuarioDTO = u.DataAcessoUsuario
+                    };
+                    usuariosRetorno.Add(usuarioDTO);
+                }
+
                 return Ok(usuariosRetorno);
             }
             catch (Exception ex)

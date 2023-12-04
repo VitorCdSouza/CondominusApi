@@ -43,7 +43,17 @@ namespace CondominusApi.Data
                 .HasForeignKey(pac => pac.IdAreaComumPessArea);
             // declaracao do relacionamento entre pessoa e notificacao N para N
             modelBuilder.Entity<PessoaNoti>()
-                .HasKey(pac => new { pac.IdPessoaPessoaNoti, pac.IdNotificacaoPessoaNoti });
+            .HasKey(pn => new { pn.IdPessoaPessoaNoti, pn.IdNotificacaoPessoaNoti });
+
+            modelBuilder.Entity<PessoaNoti>()
+                .HasOne(pn => pn.PessoaPessoaNoti)
+                .WithMany(p => p.PessoaNotiPessoa)
+                .HasForeignKey(pn => pn.IdPessoaPessoaNoti);
+
+            modelBuilder.Entity<PessoaNoti>()
+                .HasOne(pn => pn.NotificacaoPessoaNoti)
+                .WithMany(n => n.PessoasNotificacoes)
+                .HasForeignKey(pn => pn.IdNotificacaoPessoaNoti);
             // declaracao do relacionamento entre pessoa e usuario 1 para 1
             modelBuilder.Entity<Pessoa>()
             .HasOne(p => p.UsuarioPessoa)
@@ -67,6 +77,12 @@ namespace CondominusApi.Data
             .HasOne(a => a.CondominioApart)
             .WithMany(c => c.ApartamentosCond)
             .HasForeignKey(a => a.IdCondominioApart)
+            .OnDelete(DeleteBehavior.Cascade);
+            // declaracao de relacioanemnto entre apartamento e entregas 1 para N
+            modelBuilder.Entity<Entrega>()
+            .HasOne(e => e.ApartamentoEnt)
+            .WithMany(a => a.EntregasApart)
+            .HasForeignKey(e => e.IdApartamentoEnt)
             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Condominio>().HasData(
