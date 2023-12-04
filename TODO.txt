@@ -1,10 +1,11 @@
-1(ok)- Criar método adicionar Dependentes em Pessoas
-2(ok)- Vincular registro de Usuario a Pessoa
+Talvez Condominio pra dps
 
-3(parcial)- Ajustar visibilidade das controllers
+Terminar controller:
+    AreasComuns (facil)
+    Dependentes (facil)
+    Entregas (Facil)
+    Notificacao (chato)
 
-4(ok)- Relacionamentos n pra 1 (Varios Dependentes pra uma Pessoa; Apartamentos pra Condominio; Entregas pra Apartamentos)
+Adicionar Verificacoes para adicionar PessoaAreaComum
 
-5- decidir tela, individual para cada condominio ou um geral para admin
-
-6- tirar portaria
+Testar e documentar Update e Delete de PessoasAreasComunsController

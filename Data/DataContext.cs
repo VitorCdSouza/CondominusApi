@@ -33,6 +33,14 @@ namespace CondominusApi.Data
             // declaracao do relacionamento entre pessoa e area comum N para N
             modelBuilder.Entity<PessoaAreaComum>()
                 .HasKey(pac => new { pac.IdPessoaPessArea, pac.IdAreaComumPessArea });
+            modelBuilder.Entity<PessoaAreaComum>()
+                .HasOne(pac => pac.PessoaPessArea)
+                .WithMany(p => p.PessoaACPessoa)
+                .HasForeignKey(pac => pac.IdPessoaPessArea);
+            modelBuilder.Entity<PessoaAreaComum>()
+                .HasOne(pac => pac.AreaComumPessArea)
+                .WithMany(ac => ac.PessoaACAreaComum)
+                .HasForeignKey(pac => pac.IdAreaComumPessArea);
             // declaracao do relacionamento entre pessoa e notificacao N para N
             modelBuilder.Entity<PessoaNoti>()
                 .HasKey(pac => new { pac.IdPessoaPessoaNoti, pac.IdNotificacaoPessoaNoti });
@@ -42,6 +50,24 @@ namespace CondominusApi.Data
             .WithOne(u => u.PessoaUsuario)
             .HasForeignKey<Usuario>(u => u.IdUsuario)
             .IsRequired();
+            // declaracao de relacioanemnto entre pessoa e dependentes 1 para N
+            modelBuilder.Entity<Dependente>()
+            .HasOne(d => d.PessoaDependente)
+            .WithMany(p => p.DependentesPessoa)
+            .HasForeignKey(d => d.IdPessoaDependente)
+            .OnDelete(DeleteBehavior.Cascade);
+            // declaracao de relacioanemnto entre apartamento e pessoas 1 para N
+            modelBuilder.Entity<Pessoa>()
+            .HasOne(p => p.ApartamentoPessoa)
+            .WithMany(a => a.PessoasApart)
+            .HasForeignKey(p => p.IdApartamentoPessoa)
+            .OnDelete(DeleteBehavior.Cascade);
+            // declaracao de relacioanemnto entre condominio e apartamentos 1 para N
+            modelBuilder.Entity<Apartamento>()
+            .HasOne(a => a.CondominioApart)
+            .WithMany(c => c.ApartamentosCond)
+            .HasForeignKey(a => a.IdCondominioApart)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Condominio>().HasData(
                 new Condominio() { IdCond = 1, NomeCond = "Vila Nova Maria", EnderecoCond = "Rua Guaranésia, 1070", ApartamentosCond = {}},
@@ -59,7 +85,7 @@ namespace CondominusApi.Data
                 new Entrega() { IdEnt = 3, DestinatarioEnt = "Ana Clara", CodEnt = "NBR3581415", DataEntregaEnt = DateTime.Now, DataRetiradaEnt = DateTime.Now.AddDays(1), IdApartamentoEnt = 3 }
             );
             modelBuilder.Entity<Pessoa>().HasData( // usuario adicionado depois
-                new Pessoa(){ IdPessoa = 1, NomePessoa = "João Gomes", TelefonePessoa = "11924316523", TipoPessoa = "Sindico", CpfPessoa = "56751898901", IdApartamentoPessoa = 1},
+                new Pessoa(){ IdPessoa = 1, NomePessoa = "João Gomes", TelefonePessoa = "11924316523", TipoPessoa = "Admin", CpfPessoa = "56751898901", IdApartamentoPessoa = 1},
                 new Pessoa(){ IdPessoa = 2, NomePessoa = "Maria Oliveira", TelefonePessoa = "1198254351", TipoPessoa = "Morador", CpfPessoa = "89674156892", IdApartamentoPessoa = 2},
                 new Pessoa(){ IdPessoa = 3, NomePessoa = "João Viana", TelefonePessoa = "11984512345", TipoPessoa = "Morador", CpfPessoa = "32569874561", IdApartamentoPessoa = 3}
             );
@@ -77,11 +103,11 @@ namespace CondominusApi.Data
                 new AreaComum() { IdAreaComum = 2, NomeAreaComum = "Salão de Jogos" },
                 new AreaComum() { IdAreaComum = 3, NomeAreaComum = "Quadra" }
             );
-            modelBuilder.Entity<PessoaAreaComum>().HasData(
-                new PessoaAreaComum() { IdPessArea = 1, dataHoraInicioPessArea = new DateTime(2023, 12, 05, 15, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 05, 18, 00, 00), IdPessoaPessArea = 1, IdAreaComumPessArea = 1 },
-                new PessoaAreaComum() { IdPessArea = 2, dataHoraInicioPessArea = new DateTime(2023, 12, 06, 13, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 06, 16, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 1 },
-                new PessoaAreaComum() { IdPessArea = 2, dataHoraInicioPessArea = new DateTime(2023, 12, 16, 18, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 16, 21, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 2 }
-            );
+            // modelBuilder.Entity<PessoaAreaComum>().HasData(
+            //     // new PessoaAreaComum() { IdPessArea = 1, dataHoraInicioPessArea = new DateTime(2023, 12, 05, 15, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 05, 18, 00, 00), IdPessoaPessArea = 1, IdAreaComumPessArea = 1 },
+            //     // new PessoaAreaComum() { IdPessArea = 2, dataHoraInicioPessArea = new DateTime(2023, 12, 06, 13, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 06, 16, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 1 },
+            //     // new PessoaAreaComum() { IdPessArea = 3, dataHoraInicioPessArea = new DateTime(2023, 12, 16, 18, 00, 00), dataHoraFimPessArea = new DateTime(2023, 12, 16, 21, 00, 00), IdPessoaPessArea = 2, IdAreaComumPessArea = 2 }
+            // );
 
             modelBuilder.Entity<Notificacao>().HasData(
                 new Notificacao() { IdNotificacao = 1, AssuntoNotificacao = "Manutenção elétrica", MensagemNotificacao = "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas",  DataEnvioNotificacao = new DateTime(2023, 12, 06, 09, 13, 22)}

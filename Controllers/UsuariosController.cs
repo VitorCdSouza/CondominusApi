@@ -27,13 +27,14 @@ namespace CondominusApi.Controllers
             _configuration = configuration;
         }
 
-        private string CriarToken(Usuario usuario)
+        private string CriarToken(Usuario usuario, string numeroCond)
         {
             List<Claim> claims = new List<Claim> // informacoes que aparecerao no token
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
-                new Claim(ClaimTypes.Name, usuario.EmailUsuario),
-                new Claim(ClaimTypes.Role, usuario.PessoaUsuario.TipoPessoa)
+                new Claim(ClaimTypes.Email, usuario.EmailUsuario),
+                new Claim(ClaimTypes.Role, usuario.PessoaUsuario.TipoPessoa),
+                new Claim(ClaimTypes.Actor, numeroCond)
             };
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration
             .GetSection("ConfiguracaoToken:Chave").Value));
@@ -148,8 +149,10 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                Usuario usuario = await _context.Usuarios.Include(r => r.PessoaUsuario)
-                   .FirstOrDefaultAsync(x => x.EmailUsuario == credenciais.EmailUsuario);
+                Usuario usuario = await _context.Usuarios
+                .Include(r => r.PessoaUsuario).ThenInclude(a => a.ApartamentoPessoa)
+                .ThenInclude(c => c.CondominioApart)
+                .FirstOrDefaultAsync(x => x.EmailUsuario == credenciais.EmailUsuario);
 
                 if (usuario == null)
                     throw new Exception("Usuário não encontrado.");
@@ -163,7 +166,7 @@ namespace CondominusApi.Controllers
 
                     usuario.PasswordHashUsuario = null;
                     usuario.PasswordSaltUsuario = null;
-                    usuario.TokenUsuario = CriarToken(usuario);
+                    usuario.TokenUsuario = CriarToken(usuario, usuario.PessoaUsuario.ApartamentoPessoa.CondominioApart.IdCond.ToString());
 
                     return Ok(usuario);
                 }

@@ -21,14 +21,24 @@ namespace CondominusApi.Controllers
             _context = context;
         } 
 
-        //listagem geral de pessoas
+        // listagem geral de pessoas
         [HttpGet("GetAll")]
         public async Task<IActionResult> ListarAsync()
         {
             try
             {
-                List<Dependente> dependentes = await _context.Dependentes.ToListAsync();
-                return Ok(dependentes);
+                List<Dependente> lista = await _context.Dependentes.Include(r => r.PessoaDependente).ToListAsync();
+                List<DependenteDTO> dependenteRetorno = new List<DependenteDTO>();
+                foreach (Dependente u in lista){
+                    DependenteDTO dependenteDTO = new DependenteDTO{
+                        IdDependenteDTO = u.IdDependente,
+                        NomeDependenteDTO = u.NomeDependente,
+                        CpfDependenteDTO = u.CpfDependente,
+                        NomePessoaDependenteDTO = u.PessoaDependente.NomePessoa   
+                    };
+                    dependenteRetorno.Add(dependenteDTO);
+                }
+                return Ok(dependenteRetorno);
             }
             catch (System.Exception ex)
             {
@@ -41,14 +51,13 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                // Pessoa temp = await _context.Pessoas.FirstOrDefaultAsync(p => p.Id.Equals(novoDependente.IdPessoa));
-                // temp.Dependentes.Add(novoDependente);
-                // _context.Pessoas.Update(temp);
+                Pessoa temp = await _context.Pessoas.FirstOrDefaultAsync(p => p.IdPessoa == novoDependente.IdPessoaDependente);
+                novoDependente.PessoaDependente = temp;
 
                 await _context.Dependentes.AddAsync(novoDependente);
                 await _context.SaveChangesAsync();
 
-                return Ok(novoDependente.IdDependente);
+                return Ok(novoDependente.PessoaDependente.NomePessoa);
             }
             catch (System.Exception ex)
             {

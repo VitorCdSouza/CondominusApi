@@ -29,7 +29,7 @@ namespace CondominusApi.Controllers
                 List<Apartamento> apartamentos = await _context.Apartamentos.ToListAsync();                
                 return Ok(apartamentos);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -45,7 +45,7 @@ namespace CondominusApi.Controllers
 
                 return Ok(novoApartamento.IdApart);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
