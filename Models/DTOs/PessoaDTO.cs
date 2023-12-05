@@ -13,6 +13,7 @@ namespace CondominusApi.Models
         public string TelefonePessoaDTO { get; set; }
         public string CpfPessoaDTO { get; set; }
         public string NumeroApartPessoaDTO { get; set; }
+        public string IdUsuarioPessoaDTO { get; set; }
     }
 }
 

@@ -139,6 +139,31 @@ namespace CondominusApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
+        [HttpPost("AddDepMorador")]
+        public async Task<IActionResult> AddPeloMorador(Dependente novoDependente)
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idUsuarioToken = Criptografia.ObterIdUsuarioDoToken(token.Remove(0, 7));
+
+                Usuario userTemp = await _context.Usuarios.FirstOrDefaultAsync(p => p.IdUsuario.ToString() == idUsuarioToken);
+                string idPessoaStr = userTemp.IdPessoaUsuario.ToString();
+
+                Pessoa temp = await _context.Pessoas.FirstOrDefaultAsync(p => p.IdPessoa.ToString() == idPessoaStr);
+                novoDependente.PessoaDependente = temp;
+
+                await _context.Dependentes.AddAsync(novoDependente);
+                await _context.SaveChangesAsync();
+
+                return Ok(novoDependente.PessoaDependente.NomePessoa);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPut]
         public async Task<IActionResult> Update(Dependente dependente)

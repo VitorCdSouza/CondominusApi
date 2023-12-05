@@ -108,7 +108,8 @@ namespace CondominusApi.Controllers
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
-                        NumeroApartPessoaDTO = p.ApartamentoPessoa.NumeroApart
+                        NumeroApartPessoaDTO = p.ApartamentoPessoa.NumeroApart,
+                        IdUsuarioPessoaDTO = p.IdUsuarioPessoa.ToString()
                     };
                     pessoasRetorno.Add(pessoaDTO);
                 }
