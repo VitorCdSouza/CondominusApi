@@ -56,6 +56,44 @@ namespace CondominusApi.Controllers
             {
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                string idUsuarioToken = Criptografia.ObterIdUsuarioDoToken(token.Remove(0, 7));
+
+                List<Dependente> dependentes = await _context.Dependentes
+                .Include(x => x.PessoaDependente)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.PessoaDependente.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .Where(x => x.IdPessoaDependente.ToString() == idUsuarioToken)
+                .ToListAsync();
+
+                List<DependenteDTO> dependentesRetorno = new List<DependenteDTO>();
+                foreach (Dependente x in dependentes)
+                {
+                    DependenteDTO dependenteDTO = new DependenteDTO
+                    {
+                        Id = x.IdDependente,
+                        NomeDependenteDTO = x.NomeDependente,
+                        CpfDependenteDTO = x.CpfDependente,
+                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa
+                    };
+                    dependentesRetorno.Add(dependenteDTO);
+                }
+
+                return Ok(dependentesRetorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetAllDepCondominio")]
+        public async Task<IActionResult> ListarPorDepCondominioAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
                 List<Dependente> dependentes = await _context.Dependentes
                 .Include(x => x.PessoaDependente)
                 .ThenInclude(x => x.ApartamentoPessoa)
