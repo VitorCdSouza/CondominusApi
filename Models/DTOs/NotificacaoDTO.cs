@@ -8,7 +8,7 @@ namespace CondominusApi.Models
 {
     public class NotificacaoDTO
     {
-        public int IdNotificacaoDTO { get; set; }
+        public int Id { get; set; }
         public string AssuntoNotificacaoDTO { get; set; }
         public string MensagemNotificacaoDTO { get; set; }
         public DateTime? DataEnvioNotificacaoDTO { get; set; }

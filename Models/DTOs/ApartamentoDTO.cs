@@ -8,7 +8,7 @@ namespace CondominusApi.Models
 {
     public class ApartamentoDTO
     {
-        public int IdApartamentoDTO { get; set; }
+        public int Id { get; set; }
         public string NumeroApartamentoDTO { get; set; }
         public string TelefoneApartamentoDTO { get; set; }
     }

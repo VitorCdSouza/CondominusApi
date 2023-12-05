@@ -58,12 +58,14 @@ namespace CondominusApi.Controllers
                 List<Usuario> lista = await _context.Usuarios.Include(r => r.PessoaUsuario).ToListAsync();
                 List<Usuario> usuariosMoradores = await _context.Usuarios.Where(u => u.PessoaUsuario.TipoPessoa == "Morador").ToListAsync();
                 List<UsuarioDTO> usuariosRetorno = new List<UsuarioDTO>();
-                foreach (Usuario u in usuariosMoradores){
-                    UsuarioDTO usuarioDTO = new UsuarioDTO{
-                        IdUsuarioDTO = u.IdUsuario,
+                foreach (Usuario u in usuariosMoradores)
+                {
+                    UsuarioDTO usuarioDTO = new UsuarioDTO
+                    {
+                        Id = u.IdUsuario,
                         EmailUsuarioDTO = u.EmailUsuario,
                         DataAcessoUsuarioDTO = u.DataAcessoUsuario,
-                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa   
+                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa
                     };
                     usuariosRetorno.Add(usuarioDTO);
                 }
@@ -89,12 +91,14 @@ namespace CondominusApi.Controllers
                 .Where(u => u.PessoaUsuario.TipoPessoa == "Morador")
                 .Where(x => x.PessoaUsuario.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
                 .ToListAsync();
-                
+
                 List<UsuarioDTO> usuariosRetorno = new List<UsuarioDTO>();
-                foreach (Usuario u in usuariosMoradores){
-                    UsuarioDTO usuarioDTO = new UsuarioDTO{
-                        IdUsuarioDTO = u.IdUsuario,
-                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa,   
+                foreach (Usuario u in usuariosMoradores)
+                {
+                    UsuarioDTO usuarioDTO = new UsuarioDTO
+                    {
+                        Id = u.IdUsuario,
+                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa,
                         EmailUsuarioDTO = u.EmailUsuario,
                         DataAcessoUsuarioDTO = u.DataAcessoUsuario
                     };
@@ -119,7 +123,7 @@ namespace CondominusApi.Controllers
         }
         private async Task<bool> UsuarioPessoaExistente(string cpf)
         {
-            Pessoa pessoa = await _context.Pessoas 
+            Pessoa pessoa = await _context.Pessoas
                     .FirstOrDefaultAsync(x => x.CpfPessoa == cpf);
             if (pessoa.UsuarioPessoa == null)
             {
@@ -149,7 +153,7 @@ namespace CondominusApi.Controllers
                 if (!await PessoaPreviamenteCadastrada(cpf))
                     throw new Exception("Pessoa não cadastrada pelo síndico.");
 
-                Pessoa pessoa = await _context.Pessoas 
+                Pessoa pessoa = await _context.Pessoas
                     .FirstOrDefaultAsync(x => x.CpfPessoa == cpf);
 
                 Criptografia.CriarPasswordHash(usuario.SenhaUsuario, out byte[] hash, out byte[] salt);
@@ -160,7 +164,7 @@ namespace CondominusApi.Controllers
                 usuario.IdPessoaUsuario = pessoa.IdPessoa;
                 usuario.PessoaUsuario = pessoa;
 
-                
+
                 await _context.Usuarios.AddAsync(usuario);
 
                 pessoa.IdUsuarioPessoa = usuario.IdUsuario;
@@ -231,9 +235,9 @@ namespace CondominusApi.Controllers
                 }
 
                 _context.Usuarios.RemoveRange(usuariosParaDeletar);
-                
+
                 int linhasAfetadas = await _context.SaveChangesAsync();
-                
+
                 return Ok(linhasAfetadas);
             }
             catch (Exception ex)

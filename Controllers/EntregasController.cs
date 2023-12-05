@@ -15,19 +15,19 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class EntregasController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public EntregasController(DataContext context)
         {
             _context = context;
-        }  
+        }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> ListarAsync()
         {
             try
             {
-                List<Entrega> entregas = await _context.Entregas.ToListAsync();                
+                List<Entrega> entregas = await _context.Entregas.ToListAsync();
                 return Ok(entregas);
             }
             catch (System.Exception ex)
@@ -48,11 +48,13 @@ namespace CondominusApi.Controllers
                 .ThenInclude(x => x.CondominioApart)
                 .Where(x => x.ApartamentoEnt.CondominioApart.IdCond.ToString() == idCondominioToken)
                 .ToListAsync();
-                
+
                 List<EntregaDTO> entregasRetorno = new List<EntregaDTO>();
-                foreach (Entrega x in entregas){
-                    EntregaDTO entregaDTO = new EntregaDTO{
-                        IdEntDTO = x.IdEnt,
+                foreach (Entrega x in entregas)
+                {
+                    EntregaDTO entregaDTO = new EntregaDTO
+                    {
+                        Id = x.IdEnt,
                         DestinatarioEntDTO = x.DestinatarioEnt,
                         NumeroApartDTO = x.ApartamentoEnt.NumeroApart,
                         DataEntregaEntDTO = x.DataEntregaEnt,

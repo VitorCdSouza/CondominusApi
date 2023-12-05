@@ -8,7 +8,7 @@ namespace CondominusApi.Models
 {
     public class EntregaDTO
     {
-        public int IdEntDTO { get; set; }
+        public int Id { get; set; }
         public string DestinatarioEntDTO { get; set; }
         public string NumeroApartDTO { get; set; }
         public DateTime? DataEntregaEntDTO { get; set; }

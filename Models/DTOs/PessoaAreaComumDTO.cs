@@ -8,7 +8,7 @@ namespace CondominusApi.Models
 {
     public class PessoaAreaComumDTO
     {
-        public int IdPessAreaDTO { get; set; }
+        public int Id { get; set; }
         public string NomeAreaPessAreaDTO { get; set; }
         public DateTime dataHoraInicioPessAreaDTO { get; set; }
         public DateTime dataHoraFimPessAreaDTO { get; set; }

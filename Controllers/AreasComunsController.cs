@@ -15,19 +15,19 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class AreasComunsController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public AreasComunsController(DataContext context)
         {
             _context = context;
-        } 
+        }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> ListarAsync()
         {
             try
             {
-                List<AreaComum> areasComuns = await _context.AreasComuns.ToListAsync();                
+                List<AreaComum> areasComuns = await _context.AreasComuns.ToListAsync();
                 return Ok(areasComuns);
             }
             catch (System.Exception ex)
@@ -43,7 +43,7 @@ namespace CondominusApi.Controllers
             {
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
-                var areasComuns = _context.AreasComuns
+                var areasComuns = await _context.AreasComuns
                 .Where(ac => ac.PessoaACAreaComum
                     .Any(pa => pa.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken))
                 .ToListAsync();

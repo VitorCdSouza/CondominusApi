@@ -8,10 +8,10 @@ namespace CondominusApi.Models
 {
     public class UsuarioDTO
     {
-        public int IdUsuarioDTO { get; set; }
+        public int Id { get; set; }
         public string NomeUsuarioDTO { get; set; }
         public string EmailUsuarioDTO { get; set; }
-        public DateTime? DataAcessoUsuarioDTO{ get; set; }
+        public DateTime? DataAcessoUsuarioDTO { get; set; }
     }
 }
 

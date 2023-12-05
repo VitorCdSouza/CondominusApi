@@ -8,7 +8,7 @@ namespace CondominusApi.Models
 {
     public class PessoaDTO
     {
-        public int IdPessoaDTO { get; set; }
+        public int Id { get; set; }
         public string NomePessoaDTO { get; set; }
         public string TelefonePessoaDTO { get; set; }
         public string CpfPessoaDTO { get; set; }

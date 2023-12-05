@@ -15,7 +15,7 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class PessoasAreasComunsController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public PessoasAreasComunsController(DataContext context)
         {
@@ -31,7 +31,7 @@ namespace CondominusApi.Controllers
                 .PessoasAreasComuns
                 .Include(p => p.PessoaPessArea)
                 .Include(ac => ac.AreaComumPessArea)
-                .ToListAsync();                
+                .ToListAsync();
                 return Ok(pessoasAreasComuns);
             }
             catch (Exception ex)
@@ -54,12 +54,14 @@ namespace CondominusApi.Controllers
                 .ThenInclude(x => x.CondominioApart)
                 .Where(x => x.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
                 .ToListAsync();
-                
+
                 List<PessoaAreaComumDTO> pessoasAreasComunsRetorno = new List<PessoaAreaComumDTO>();
-                foreach (PessoaAreaComum x in pessoasAreasComuns){
-                    PessoaAreaComumDTO pessoaAreaComumDTO = new PessoaAreaComumDTO{
-                        IdPessAreaDTO = x.IdPessoaPessArea,
-                        NomeAreaPessAreaDTO = x.AreaComumPessArea.NomeAreaComum,   
+                foreach (PessoaAreaComum x in pessoasAreasComuns)
+                {
+                    PessoaAreaComumDTO pessoaAreaComumDTO = new PessoaAreaComumDTO
+                    {
+                        Id = x.IdPessoaPessArea,
+                        NomeAreaPessAreaDTO = x.AreaComumPessArea.NomeAreaComum,
                         dataHoraInicioPessAreaDTO = x.dataHoraInicioPessArea,
                         dataHoraFimPessAreaDTO = x.dataHoraFimPessArea,
                         NomePessoaDTO = x.PessoaPessArea.NomePessoa

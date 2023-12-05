@@ -12,7 +12,7 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class ApartamentosController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public ApartamentosController(DataContext context)
         {
@@ -24,7 +24,7 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                List<Apartamento> apartamentos = await _context.Apartamentos.ToListAsync();                
+                List<Apartamento> apartamentos = await _context.Apartamentos.ToListAsync();
                 return Ok(apartamentos);
             }
             catch (Exception ex)
@@ -44,11 +44,13 @@ namespace CondominusApi.Controllers
                 .Include(c => c.CondominioApart)
                 .Where(ap => ap.IdCondominioApart.ToString() == idCondominioToken)
                 .ToListAsync();
-                
+
                 List<ApartamentoDTO> apartamentosRetorno = new List<ApartamentoDTO>();
-                foreach (Apartamento x in apartamentos){
-                    ApartamentoDTO apartamentoDTO = new ApartamentoDTO{
-                        IdApartamentoDTO = x.IdApart,
+                foreach (Apartamento x in apartamentos)
+                {
+                    ApartamentoDTO apartamentoDTO = new ApartamentoDTO
+                    {
+                        Id = x.IdApart,
                         NumeroApartamentoDTO = x.NumeroApart,
                         TelefoneApartamentoDTO = x.TelefoneApart
                     };

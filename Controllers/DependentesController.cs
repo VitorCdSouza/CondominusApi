@@ -15,12 +15,12 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class DependentesController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public DependentesController(DataContext context)
         {
             _context = context;
-        } 
+        }
 
         // listagem geral de pessoas
         [HttpGet("GetAll")]
@@ -30,12 +30,14 @@ namespace CondominusApi.Controllers
             {
                 List<Dependente> lista = await _context.Dependentes.Include(r => r.PessoaDependente).ToListAsync();
                 List<DependenteDTO> dependenteRetorno = new List<DependenteDTO>();
-                foreach (Dependente u in lista){
-                    DependenteDTO dependenteDTO = new DependenteDTO{
-                        IdDependenteDTO = u.IdDependente,
+                foreach (Dependente u in lista)
+                {
+                    DependenteDTO dependenteDTO = new DependenteDTO
+                    {
+                        Id = u.IdDependente,
                         NomeDependenteDTO = u.NomeDependente,
                         CpfDependenteDTO = u.CpfDependente,
-                        NomePessoaDependenteDTO = u.PessoaDependente.NomePessoa   
+                        NomePessoaDependenteDTO = u.PessoaDependente.NomePessoa
                     };
                     dependenteRetorno.Add(dependenteDTO);
                 }
@@ -60,11 +62,13 @@ namespace CondominusApi.Controllers
                 .ThenInclude(x => x.CondominioApart)
                 .Where(x => x.PessoaDependente.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
                 .ToListAsync();
-                
+
                 List<DependenteDTO> dependentesRetorno = new List<DependenteDTO>();
-                foreach (Dependente x in dependentes){
-                    DependenteDTO dependenteDTO = new DependenteDTO{
-                        IdDependenteDTO = x.IdDependente,
+                foreach (Dependente x in dependentes)
+                {
+                    DependenteDTO dependenteDTO = new DependenteDTO
+                    {
+                        Id = x.IdDependente,
                         NomeDependenteDTO = x.NomeDependente,
                         CpfDependenteDTO = x.CpfDependente,
                         NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa

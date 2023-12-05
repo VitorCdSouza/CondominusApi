@@ -15,12 +15,12 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class PessoasController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public PessoasController(DataContext context)
         {
             _context = context;
-        } 
+        }
 
         // listagem geral de pessoas
         [HttpGet("GetAll")]
@@ -33,9 +33,11 @@ namespace CondominusApi.Controllers
                 .Include(a => a.ApartamentoPessoa)
                 .ToListAsync();
                 List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
-                foreach (Pessoa p in lista){
-                    PessoaDTO pessoaDTO = new PessoaDTO{
-                        IdPessoaDTO = p.IdPessoa,
+                foreach (Pessoa p in lista)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
@@ -60,12 +62,14 @@ namespace CondominusApi.Controllers
                 List<Pessoa> pessoas = await _context.Pessoas
                 .Include(d => d.DependentesPessoa)
                 .Include(a => a.ApartamentoPessoa)
-                .ToListAsync();           
-                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Morador").ToList();    
+                .ToListAsync();
+                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Morador").ToList();
                 List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
-                foreach (Pessoa p in moradores){
-                    PessoaDTO pessoaDTO = new PessoaDTO{
-                        IdPessoaDTO = p.IdPessoa,
+                foreach (Pessoa p in moradores)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
@@ -93,12 +97,14 @@ namespace CondominusApi.Controllers
                 .ThenInclude(c => c.CondominioApart)
                 .Where(p => p.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
                 .Where(p => p.TipoPessoa == "Morador")
-                .ToListAsync();      
-                
+                .ToListAsync();
+
                 List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
-                foreach (Pessoa p in pessoas){
-                    PessoaDTO pessoaDTO = new PessoaDTO{
-                        IdPessoaDTO = p.IdPessoa,
+                foreach (Pessoa p in pessoas)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
@@ -124,12 +130,14 @@ namespace CondominusApi.Controllers
                 List<Pessoa> pessoas = await _context.Pessoas
                 .Include(d => d.DependentesPessoa)
                 .Include(a => a.ApartamentoPessoa)
-                .ToListAsync();           
-                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Sindico").ToList();    
+                .ToListAsync();
+                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Sindico").ToList();
                 List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
-                foreach (Pessoa p in moradores){
-                    PessoaDTO pessoaDTO = new PessoaDTO{
-                        IdPessoaDTO = p.IdPessoa,
+                foreach (Pessoa p in moradores)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
@@ -154,12 +162,14 @@ namespace CondominusApi.Controllers
                 List<Pessoa> pessoas = await _context.Pessoas
                 .Include(d => d.DependentesPessoa)
                 .Include(a => a.ApartamentoPessoa)
-                .ToListAsync();           
-                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Porteiro").ToList();    
+                .ToListAsync();
+                List<Pessoa> moradores = pessoas.Where(p => p.TipoPessoa == "Porteiro").ToList();
                 List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
-                foreach (Pessoa p in moradores){
-                    PessoaDTO pessoaDTO = new PessoaDTO{
-                        IdPessoaDTO = p.IdPessoa,
+                foreach (Pessoa p in moradores)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
                         NomePessoaDTO = p.NomePessoa,
                         TelefonePessoaDTO = p.TelefonePessoa,
                         CpfPessoaDTO = p.CpfPessoa,
@@ -167,7 +177,7 @@ namespace CondominusApi.Controllers
                     };
                     pessoasRetorno.Add(pessoaDTO);
                 }
-                return Ok(pessoasRetorno);     
+                return Ok(pessoasRetorno);
             }
             catch (Exception ex)
             {
@@ -189,7 +199,7 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                if(await CpfCadastrado(novoPessoa.CpfPessoa))
+                if (await CpfCadastrado(novoPessoa.CpfPessoa))
                     throw new Exception("Cpf já cadastrado.");
 
                 Apartamento ap = await _context.Apartamentos
@@ -206,7 +216,7 @@ namespace CondominusApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
+
         [HttpPut]
         public async Task<IActionResult> Update(Pessoa p)
         {
