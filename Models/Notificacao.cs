@@ -13,7 +13,7 @@ namespace CondominusApi.Models
         public string AssuntoNotificacao { get; set; }
         public string MensagemNotificacao { get; set; }
         public DateTime DataEnvioNotificacao { get; set; }
-        public List<PessoaNoti> PessoasNotificacoes { get; set; }
-        public int IdPessoaNotificacao { get; set; }
+        public string TipoNotificacao { get; set; }
+        public string IdCondominioNotificacao { get; set; }
     }
 }

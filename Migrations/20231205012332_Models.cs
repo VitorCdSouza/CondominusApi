@@ -49,7 +49,8 @@ namespace CondominusApi.Migrations
                     AssuntoNotificacao = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MensagemNotificacao = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DataEnvioNotificacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IdPessoaNotificacao = table.Column<int>(type: "int", nullable: false)
+                    TipoNotificacao = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdCondominioNotificacao = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -146,31 +147,6 @@ namespace CondominusApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PessoaNotis",
-                columns: table => new
-                {
-                    IdPessoaPessoaNoti = table.Column<int>(type: "int", nullable: false),
-                    IdNotificacaoPessoaNoti = table.Column<int>(type: "int", nullable: false),
-                    IdPessoaNoti = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PessoaNotis", x => new { x.IdPessoaPessoaNoti, x.IdNotificacaoPessoaNoti });
-                    table.ForeignKey(
-                        name: "FK_PessoaNotis_Notificacoes_IdNotificacaoPessoaNoti",
-                        column: x => x.IdNotificacaoPessoaNoti,
-                        principalTable: "Notificacoes",
-                        principalColumn: "IdNotificacao",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PessoaNotis_Pessoas_IdPessoaPessoaNoti",
-                        column: x => x.IdPessoaPessoaNoti,
-                        principalTable: "Pessoas",
-                        principalColumn: "IdPessoa",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PessoasAreasComuns",
                 columns: table => new
                 {
@@ -242,8 +218,8 @@ namespace CondominusApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "Notificacoes",
-                columns: new[] { "IdNotificacao", "AssuntoNotificacao", "DataEnvioNotificacao", "IdPessoaNotificacao", "MensagemNotificacao" },
-                values: new object[] { 1, "Manutenção elétrica", new DateTime(2023, 12, 6, 9, 13, 22, 0, DateTimeKind.Unspecified), 0, "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas" });
+                columns: new[] { "IdNotificacao", "AssuntoNotificacao", "DataEnvioNotificacao", "IdCondominioNotificacao", "MensagemNotificacao", "TipoNotificacao" },
+                values: new object[] { 1, "Manutenção elétrica", new DateTime(2023, 12, 6, 9, 13, 22, 0, DateTimeKind.Unspecified), "1", "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas", "Aviso" });
 
             migrationBuilder.InsertData(
                 table: "Apartamentos",
@@ -260,9 +236,9 @@ namespace CondominusApi.Migrations
                 columns: new[] { "IdEnt", "CodEnt", "DataEntregaEnt", "DataRetiradaEnt", "DestinatarioEnt", "IdApartamentoEnt" },
                 values: new object[,]
                 {
-                    { 1, "NBR1354897", new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8709), new DateTime(2023, 12, 5, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8724), "Joao Guilherme", 1 },
-                    { 2, "NBR2468135", new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8730), new DateTime(2023, 12, 6, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8731), "Maria Joaquina", 2 },
-                    { 3, "NBR3581415", new DateTime(2023, 12, 4, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8733), new DateTime(2023, 12, 5, 16, 52, 49, 642, DateTimeKind.Local).AddTicks(8733), "Ana Clara", 3 }
+                    { 1, "NBR1354897", new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(314), new DateTime(2023, 12, 5, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(326), "Joao Guilherme", 1 },
+                    { 2, "NBR2468135", new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(333), new DateTime(2023, 12, 6, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(334), "Maria Joaquina", 2 },
+                    { 3, "NBR3581415", new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(335), new DateTime(2023, 12, 5, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(336), "Ana Clara", 3 }
                 });
 
             migrationBuilder.InsertData(
@@ -288,14 +264,9 @@ namespace CondominusApi.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "PessoaNotis",
-                columns: new[] { "IdNotificacaoPessoaNoti", "IdPessoaPessoaNoti", "IdPessoaNoti" },
-                values: new object[] { 1, 1, 1 });
-
-            migrationBuilder.InsertData(
                 table: "Usuarios",
                 columns: new[] { "IdUsuario", "DataAcessoUsuario", "EmailUsuario", "IdPessoaUsuario", "PasswordHashUsuario", "PasswordSaltUsuario" },
-                values: new object[] { 1, null, "admin@gmail.com", 1, new byte[] { 232, 179, 122, 22, 7, 112, 236, 81, 30, 170, 55, 87, 242, 122, 254, 225, 112, 228, 182, 122, 75, 202, 100, 241, 248, 152, 74, 20, 21, 136, 26, 43, 116, 85, 204, 201, 101, 192, 106, 53, 116, 223, 60, 89, 63, 244, 160, 9, 37, 34, 41, 76, 228, 153, 39, 47, 215, 103, 188, 22, 2, 185, 104, 44 }, new byte[] { 195, 120, 245, 121, 241, 22, 63, 75, 234, 191, 11, 87, 14, 91, 81, 186, 161, 55, 199, 241, 62, 29, 67, 132, 118, 102, 40, 177, 67, 158, 211, 36, 26, 136, 194, 131, 253, 247, 39, 22, 230, 115, 113, 201, 231, 113, 113, 195, 230, 120, 65, 43, 118, 197, 52, 13, 218, 81, 24, 87, 86, 50, 42, 36, 229, 98, 217, 224, 20, 222, 68, 192, 95, 80, 24, 91, 100, 135, 225, 9, 61, 209, 124, 144, 208, 175, 124, 14, 168, 194, 35, 181, 6, 35, 160, 180, 82, 95, 177, 22, 167, 61, 86, 73, 212, 101, 35, 226, 191, 225, 43, 245, 24, 98, 101, 78, 163, 84, 38, 66, 181, 154, 41, 148, 99, 161, 85, 170 } });
+                values: new object[] { 1, null, "admin@gmail.com", 1, new byte[] { 153, 69, 153, 96, 250, 135, 142, 169, 122, 107, 219, 164, 125, 54, 0, 169, 92, 9, 61, 6, 144, 101, 226, 154, 118, 116, 170, 13, 85, 145, 234, 42, 167, 244, 16, 228, 142, 69, 1, 168, 128, 237, 95, 65, 206, 140, 187, 35, 94, 94, 30, 96, 77, 71, 81, 22, 18, 138, 68, 220, 22, 176, 68, 80 }, new byte[] { 194, 25, 9, 61, 133, 187, 16, 224, 94, 217, 133, 60, 240, 124, 1, 212, 216, 153, 236, 26, 35, 76, 252, 93, 212, 32, 51, 80, 128, 52, 187, 123, 140, 227, 242, 149, 2, 109, 29, 213, 194, 138, 32, 9, 86, 68, 219, 219, 219, 201, 240, 181, 66, 114, 124, 243, 102, 9, 147, 228, 156, 4, 138, 241, 31, 223, 232, 236, 100, 182, 33, 8, 100, 60, 70, 144, 158, 253, 32, 95, 66, 48, 229, 28, 215, 120, 158, 249, 121, 63, 57, 155, 226, 162, 141, 205, 208, 50, 147, 131, 20, 164, 253, 35, 150, 248, 80, 196, 112, 125, 5, 16, 142, 190, 187, 195, 181, 204, 142, 23, 54, 189, 9, 114, 123, 108, 78, 213 } });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Apartamentos_IdCondominioApart",
@@ -311,11 +282,6 @@ namespace CondominusApi.Migrations
                 name: "IX_Entregas_IdApartamentoEnt",
                 table: "Entregas",
                 column: "IdApartamentoEnt");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PessoaNotis_IdNotificacaoPessoaNoti",
-                table: "PessoaNotis",
-                column: "IdNotificacaoPessoaNoti");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pessoas_IdApartamentoPessoa",
@@ -338,16 +304,13 @@ namespace CondominusApi.Migrations
                 name: "Entregas");
 
             migrationBuilder.DropTable(
-                name: "PessoaNotis");
+                name: "Notificacoes");
 
             migrationBuilder.DropTable(
                 name: "PessoasAreasComuns");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");
-
-            migrationBuilder.DropTable(
-                name: "Notificacoes");
 
             migrationBuilder.DropTable(
                 name: "AreasComuns");

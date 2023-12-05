@@ -45,17 +45,12 @@ namespace CondominusApi.Controllers
             {
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
-                var notificacoes = _context.Condominios
-                    .Where(c => c.IdCond.ToString() == idCondominioToken)
-                    .SelectMany(c => c.ApartamentosCond)
-                    .SelectMany(a => a.PessoasApart)
-                    .Where(p => p.TipoPessoa == "Morador")
-                    .SelectMany(p => p.PessoaNotiPessoa)
-                    .Select(pn => pn.NotificacaoPessoaNoti)
-                    .Distinct()
-                    .ToList();
+                List<Notificacao> feedback = await _context.Notificacoes
+                    .Where(c => c.IdCondominioNotificacao == idCondominioToken)
+                    .Where(p => p.TipoNotificacao == "Feedback")
+                    .ToListAsync();
                 
-                return Ok(notificacoes);
+                return Ok(feedback);
             }
             catch (Exception ex)
             {
@@ -70,17 +65,33 @@ namespace CondominusApi.Controllers
             {
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
-                var notificacoes = _context.Condominios
-                    .Where(c => c.IdCond.ToString() == idCondominioToken)
-                    .SelectMany(c => c.ApartamentosCond)
-                    .SelectMany(a => a.PessoasApart)
-                    .Where(p => p.TipoPessoa == "Sindico")
-                    .SelectMany(p => p.PessoaNotiPessoa)
-                    .Select(pn => pn.NotificacaoPessoaNoti)
-                    .Distinct()
-                    .ToList();
+                List<Notificacao> avisos = await _context.Notificacoes
+                    .Where(c => c.IdCondominioNotificacao == idCondominioToken)
+                    .Where(p => p.TipoNotificacao == "Aviso")
+                    .ToListAsync();
                 
-                return Ok(notificacoes);
+                return Ok(avisos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(Notificacao novaNotificacao)
+        {
+            try
+            {
+                
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                novaNotificacao.IdCondominioNotificacao = idCondominioToken;
+                
+                await _context.Notificacoes.AddAsync(novaNotificacao);
+                await _context.SaveChangesAsync();
+
+                return Ok(novaNotificacao);
             }
             catch (Exception ex)
             {

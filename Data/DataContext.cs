@@ -25,7 +25,6 @@ namespace CondominusApi.Data
         public DbSet<Notificacao> Notificacoes { get; set; }
         public DbSet<Pessoa> Pessoas { get; set; }
         public DbSet<PessoaAreaComum> PessoasAreasComuns { get; set; }
-        public DbSet<PessoaNoti> PessoaNotis { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,19 +40,6 @@ namespace CondominusApi.Data
                 .HasOne(pac => pac.AreaComumPessArea)
                 .WithMany(ac => ac.PessoaACAreaComum)
                 .HasForeignKey(pac => pac.IdAreaComumPessArea);
-            // declaracao do relacionamento entre pessoa e notificacao N para N
-            modelBuilder.Entity<PessoaNoti>()
-            .HasKey(pn => new { pn.IdPessoaPessoaNoti, pn.IdNotificacaoPessoaNoti });
-
-            modelBuilder.Entity<PessoaNoti>()
-                .HasOne(pn => pn.PessoaPessoaNoti)
-                .WithMany(p => p.PessoaNotiPessoa)
-                .HasForeignKey(pn => pn.IdPessoaPessoaNoti);
-
-            modelBuilder.Entity<PessoaNoti>()
-                .HasOne(pn => pn.NotificacaoPessoaNoti)
-                .WithMany(n => n.PessoasNotificacoes)
-                .HasForeignKey(pn => pn.IdNotificacaoPessoaNoti);
             // declaracao do relacionamento entre pessoa e usuario 1 para 1
             modelBuilder.Entity<Pessoa>()
             .HasOne(p => p.UsuarioPessoa)
@@ -126,10 +112,7 @@ namespace CondominusApi.Data
             // );
 
             modelBuilder.Entity<Notificacao>().HasData(
-                new Notificacao() { IdNotificacao = 1, AssuntoNotificacao = "Manutenção elétrica", MensagemNotificacao = "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas",  DataEnvioNotificacao = new DateTime(2023, 12, 06, 09, 13, 22)}
-            );
-            modelBuilder.Entity<PessoaNoti>().HasData(
-                new PessoaNoti() { IdPessoaNoti = 1, IdPessoaPessoaNoti = 1, IdNotificacaoPessoaNoti = 1 }
+                new Notificacao() { IdNotificacao = 1, AssuntoNotificacao = "Manutenção elétrica", MensagemNotificacao = "Haverá manutencão no quadro de força do prédio, dia: 20/12 as 14 horas",  DataEnvioNotificacao = new DateTime(2023, 12, 06, 09, 13, 22), TipoNotificacao = "Aviso", IdCondominioNotificacao = "1"}
             );
 
             modelBuilder.Entity<Dependente>().HasData(

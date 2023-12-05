@@ -31,7 +31,7 @@ namespace CondominusApi.Controllers
         {
             List<Claim> claims = new List<Claim> // informacoes que aparecerao no token
             {
-                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                new Claim(ClaimTypes.Actor, usuario.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Email, usuario.EmailUsuario),
                 new Claim(ClaimTypes.Role, usuario.PessoaUsuario.TipoPessoa),
                 new Claim(JwtRegisteredClaimNames.Sub, numeroCond)

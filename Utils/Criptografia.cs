@@ -43,5 +43,16 @@ namespace CondominusApi.Utils
             return IdCond;
         }
 
+        public static string ObterIdUsuarioDoToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            var IdUser = jsonToken?.Actor;
+
+            return IdUser;
+        }
+
+
     }
 }

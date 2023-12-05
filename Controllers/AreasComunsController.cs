@@ -43,7 +43,7 @@ namespace CondominusApi.Controllers
             {
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
-                var areasComuns = _context.AreasComuns
+                var areasComuns = await _context.AreasComuns
                 .Where(ac => ac.PessoaACAreaComum
                     .Any(pa => pa.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken))
                 .ToListAsync();
