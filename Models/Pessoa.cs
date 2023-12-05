@@ -20,6 +20,5 @@ namespace CondominusApi.Models
         public int? IdUsuarioPessoa { get; set; }
         public List<Dependente> DependentesPessoa { get; set; }
         public List<PessoaAreaComum> PessoaACPessoa { get; set; }
-        public List<PessoaNoti> PessoaNotiPessoa { get; set; }
     }
 }
