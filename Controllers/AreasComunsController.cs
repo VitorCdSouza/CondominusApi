@@ -44,11 +44,21 @@ namespace CondominusApi.Controllers
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
                 var areasComuns = await _context.AreasComuns
-                .Where(ac => ac.PessoaACAreaComum
-                    .Any(pa => pa.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken))
+                .Where(c => c.IdCondominioAreaComum == idCondominioToken)
                 .ToListAsync();
 
-                return Ok(areasComuns);
+                List<AreaComumDTO> areasRetorno = new List<AreaComumDTO>();
+                foreach (AreaComum x in areasComuns)
+                {
+                    AreaComumDTO areaDTO = new AreaComumDTO
+                    {
+                        Id = x.IdAreaComum,
+                        NomeAreaComumDTO = x.NomeAreaComum
+                    };
+                    areasRetorno.Add(areaDTO);
+                }
+
+                return Ok(areasRetorno);
             }
             catch (Exception ex)
             {
@@ -61,6 +71,10 @@ namespace CondominusApi.Controllers
         {
             try
             {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                novaAreaComum.IdCondominioAreaComum = idCondominioToken;
+
                 await _context.AreasComuns.AddAsync(novaAreaComum);
                 await _context.SaveChangesAsync();
 

@@ -12,5 +12,6 @@ namespace CondominusApi.Models
         public int IdAreaComum { get; set; }
         public string NomeAreaComum { get; set; }
         public List<PessoaAreaComum> PessoaACAreaComum { get; set; } 
+        public string IdCondominioAreaComum { get; set; }
     }
 }
