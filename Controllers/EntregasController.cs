@@ -71,6 +71,47 @@ namespace CondominusApi.Controllers
             }
         }
 
+        [HttpGet("GetAllCondominioMorador")]
+        public async Task<IActionResult> ListarPorMoradorAsync()
+        {
+            try
+            {
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                string idUsuarioToken = Criptografia.ObterIdUsuarioDoToken(token.Remove(0, 7));
+
+                Pessoa pessoa = await _context.Pessoas
+                .Include(u => u.UsuarioPessoa).FirstOrDefaultAsync(x => x.UsuarioPessoa.IdUsuario.ToString() == idUsuarioToken);
+
+                List<Entrega> entregas = await _context.Entregas
+                .Include(x => x.ApartamentoEnt)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.ApartamentoEnt.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .Where(x => x.ApartamentoEnt.PessoasApart.Any(x => x.IdPessoa == pessoa.IdPessoa))
+                .ToListAsync();
+
+                List<EntregaDTO> entregasRetorno = new List<EntregaDTO>();
+                foreach (Entrega x in entregas)
+                {
+                    EntregaDTO entregaDTO = new EntregaDTO
+                    {
+                        Id = x.IdEnt,
+                        DestinatarioEntDTO = x.DestinatarioEnt,
+                        NumeroApartDTO = x.ApartamentoEnt.NumeroApart,
+                        DataEntregaEntDTO = x.DataEntregaEnt,
+                        DataRetiradaEntDTO = x.DataRetiradaEnt
+                    };
+                    entregasRetorno.Add(entregaDTO);
+                }
+
+                return Ok(entregasRetorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add(Entrega novaEntrega)
         {

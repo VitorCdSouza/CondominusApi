@@ -77,6 +77,9 @@ namespace CondominusApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAreaComum"));
 
+                    b.Property<string>("IdCondominioAreaComum")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NomeAreaComum")
                         .HasColumnType("nvarchar(max)");
 
@@ -236,8 +239,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 1,
                             CodEnt = "NBR1354897",
-                            DataEntregaEnt = new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(314),
-                            DataRetiradaEnt = new DateTime(2023, 12, 5, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(326),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7352),
+                            DataRetiradaEnt = new DateTime(2023, 12, 5, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7363),
                             DestinatarioEnt = "Joao Guilherme",
                             IdApartamentoEnt = 1
                         },
@@ -245,8 +248,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 2,
                             CodEnt = "NBR2468135",
-                            DataEntregaEnt = new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(333),
-                            DataRetiradaEnt = new DateTime(2023, 12, 6, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(334),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7369),
+                            DataRetiradaEnt = new DateTime(2023, 12, 6, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7370),
                             DestinatarioEnt = "Maria Joaquina",
                             IdApartamentoEnt = 2
                         },
@@ -254,8 +257,8 @@ namespace CondominusApi.Migrations
                         {
                             IdEnt = 3,
                             CodEnt = "NBR3581415",
-                            DataEntregaEnt = new DateTime(2023, 12, 4, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(335),
-                            DataRetiradaEnt = new DateTime(2023, 12, 5, 22, 23, 32, 107, DateTimeKind.Local).AddTicks(336),
+                            DataEntregaEnt = new DateTime(2023, 12, 4, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7371),
+                            DataRetiradaEnt = new DateTime(2023, 12, 5, 23, 43, 5, 102, DateTimeKind.Local).AddTicks(7372),
                             DestinatarioEnt = "Ana Clara",
                             IdApartamentoEnt = 3
                         });
@@ -419,8 +422,8 @@ namespace CondominusApi.Migrations
                             IdUsuario = 1,
                             EmailUsuario = "admin@gmail.com",
                             IdPessoaUsuario = 1,
-                            PasswordHashUsuario = new byte[] { 153, 69, 153, 96, 250, 135, 142, 169, 122, 107, 219, 164, 125, 54, 0, 169, 92, 9, 61, 6, 144, 101, 226, 154, 118, 116, 170, 13, 85, 145, 234, 42, 167, 244, 16, 228, 142, 69, 1, 168, 128, 237, 95, 65, 206, 140, 187, 35, 94, 94, 30, 96, 77, 71, 81, 22, 18, 138, 68, 220, 22, 176, 68, 80 },
-                            PasswordSaltUsuario = new byte[] { 194, 25, 9, 61, 133, 187, 16, 224, 94, 217, 133, 60, 240, 124, 1, 212, 216, 153, 236, 26, 35, 76, 252, 93, 212, 32, 51, 80, 128, 52, 187, 123, 140, 227, 242, 149, 2, 109, 29, 213, 194, 138, 32, 9, 86, 68, 219, 219, 219, 201, 240, 181, 66, 114, 124, 243, 102, 9, 147, 228, 156, 4, 138, 241, 31, 223, 232, 236, 100, 182, 33, 8, 100, 60, 70, 144, 158, 253, 32, 95, 66, 48, 229, 28, 215, 120, 158, 249, 121, 63, 57, 155, 226, 162, 141, 205, 208, 50, 147, 131, 20, 164, 253, 35, 150, 248, 80, 196, 112, 125, 5, 16, 142, 190, 187, 195, 181, 204, 142, 23, 54, 189, 9, 114, 123, 108, 78, 213 }
+                            PasswordHashUsuario = new byte[] { 70, 64, 69, 97, 78, 121, 159, 203, 189, 177, 225, 184, 52, 139, 89, 2, 208, 15, 50, 78, 110, 227, 51, 91, 18, 151, 60, 163, 60, 36, 227, 88, 59, 211, 204, 184, 63, 80, 241, 145, 140, 58, 178, 78, 203, 32, 146, 115, 35, 59, 36, 11, 242, 63, 6, 189, 123, 132, 69, 224, 113, 0, 59, 55 },
+                            PasswordSaltUsuario = new byte[] { 217, 46, 16, 164, 54, 210, 182, 15, 128, 124, 4, 166, 163, 90, 195, 127, 62, 111, 209, 151, 224, 32, 11, 28, 174, 227, 134, 119, 136, 73, 135, 227, 55, 97, 28, 95, 197, 161, 104, 38, 125, 192, 54, 114, 238, 102, 146, 222, 148, 84, 10, 49, 14, 161, 196, 161, 130, 120, 145, 74, 27, 245, 245, 54, 133, 86, 159, 45, 146, 163, 89, 121, 86, 54, 140, 74, 213, 140, 243, 55, 159, 48, 89, 52, 217, 15, 121, 128, 139, 190, 53, 192, 137, 66, 4, 219, 9, 221, 86, 114, 46, 99, 102, 175, 234, 189, 89, 162, 245, 56, 93, 38, 66, 63, 229, 219, 128, 183, 166, 199, 5, 157, 225, 128, 95, 168, 31, 57 }
                         });
                 });
 
