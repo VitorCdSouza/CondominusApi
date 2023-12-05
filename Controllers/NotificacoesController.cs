@@ -15,7 +15,7 @@ namespace CondominusApi.Controllers
     [Route("[controller]")]
     public class NotificacoesController : ControllerBase
     {
-        private readonly DataContext _context; 
+        private readonly DataContext _context;
 
         public NotificacoesController(DataContext context)
         {
@@ -29,7 +29,7 @@ namespace CondominusApi.Controllers
             {
                 List<Notificacao> notificacaos = await _context
                 .Notificacoes
-                .ToListAsync();                
+                .ToListAsync();
                 return Ok(notificacaos);
             }
             catch (Exception ex)
@@ -49,8 +49,21 @@ namespace CondominusApi.Controllers
                     .Where(c => c.IdCondominioNotificacao == idCondominioToken)
                     .Where(p => p.TipoNotificacao == "Feedback")
                     .ToListAsync();
-                
-                return Ok(feedback);
+
+                List<NotificacaoDTO> notificacoesRetorno = new List<NotificacaoDTO>();
+                foreach (Notificacao x in feedback)
+                {
+                    NotificacaoDTO feedDTO = new NotificacaoDTO
+                    {
+                        Id = x.IdNotificacao,
+                        AssuntoNotificacaoDTO = x.AssuntoNotificacao,
+                        MensagemNotificacaoDTO = x.MensagemNotificacao,
+                        DataEnvioNotificacaoDTO = x.DataEnvioNotificacao
+                    };
+                    notificacoesRetorno.Add(feedDTO);
+                }
+
+                return Ok(notificacoesRetorno);
             }
             catch (Exception ex)
             {
@@ -69,8 +82,21 @@ namespace CondominusApi.Controllers
                     .Where(c => c.IdCondominioNotificacao == idCondominioToken)
                     .Where(p => p.TipoNotificacao == "Aviso")
                     .ToListAsync();
-                
-                return Ok(avisos);
+
+                List<NotificacaoDTO> notificacoesRetorno = new List<NotificacaoDTO>();
+                foreach (Notificacao x in avisos)
+                {
+                    NotificacaoDTO feedDTO = new NotificacaoDTO
+                    {
+                        Id = x.IdNotificacao,
+                        AssuntoNotificacaoDTO = x.AssuntoNotificacao,
+                        MensagemNotificacaoDTO = x.MensagemNotificacao,
+                        DataEnvioNotificacaoDTO = x.DataEnvioNotificacao
+                    };
+                    notificacoesRetorno.Add(feedDTO);
+                }
+
+                return Ok(notificacoesRetorno);
             }
             catch (Exception ex)
             {
@@ -83,11 +109,11 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                
+
                 string token = HttpContext.Request.Headers["Authorization"].ToString();
                 string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
                 novaNotificacao.IdCondominioNotificacao = idCondominioToken;
-                
+
                 await _context.Notificacoes.AddAsync(novaNotificacao);
                 await _context.SaveChangesAsync();
 
