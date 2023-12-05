@@ -73,7 +73,8 @@ namespace CondominusApi.Controllers
                         Id = x.IdDependente,
                         NomeDependenteDTO = x.NomeDependente,
                         CpfDependenteDTO = x.CpfDependente,
-                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa
+                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa,
+                        NumeroApartamentoDependenteDTO = x.PessoaDependente.ApartamentoPessoa.NumeroApart
                     };
                     dependentesRetorno.Add(dependenteDTO);
                 }
@@ -108,7 +109,8 @@ namespace CondominusApi.Controllers
                         Id = x.IdDependente,
                         NomeDependenteDTO = x.NomeDependente,
                         CpfDependenteDTO = x.CpfDependente,
-                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa
+                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa,
+                        NumeroApartamentoDependenteDTO = x.PessoaDependente.ApartamentoPessoa.NumeroApart
                     };
                     dependentesRetorno.Add(dependenteDTO);
                 }
@@ -139,7 +141,7 @@ namespace CondominusApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
+
         [HttpPost("AddDepMorador")]
         public async Task<IActionResult> AddPeloMorador(Dependente novoDependente)
         {

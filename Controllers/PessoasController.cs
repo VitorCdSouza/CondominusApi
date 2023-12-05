@@ -296,9 +296,31 @@ namespace CondominusApi.Controllers
                 int linhasAfetadas = await _context.SaveChangesAsync();
 
                 // após deletar as pessoas, recupere a lista atualizada de usuários
-                var listaAtualizada = await _context.Pessoas.ToListAsync();
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Pessoa> pessoas = await _context.Pessoas
+                .Include(a => a.ApartamentoPessoa)
+                .ThenInclude(c => c.CondominioApart)
+                .Where(p => p.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .Where(p => p.TipoPessoa == "Morador")
+                .ToListAsync();
 
-                return Ok(listaAtualizada);
+                List<PessoaDTO> pessoasRetorno = new List<PessoaDTO>();
+                foreach (Pessoa p in pessoas)
+                {
+                    PessoaDTO pessoaDTO = new PessoaDTO
+                    {
+                        Id = p.IdPessoa,
+                        NomePessoaDTO = p.NomePessoa,
+                        TelefonePessoaDTO = p.TelefonePessoa,
+                        CpfPessoaDTO = p.CpfPessoa,
+                        NumeroApartPessoaDTO = p.ApartamentoPessoa.NumeroApart,
+                        IdUsuarioPessoaDTO = p.IdUsuarioPessoa.ToString()
+                    };
+                    pessoasRetorno.Add(pessoaDTO);
+                }
+
+                return Ok(pessoasRetorno);
             }
             catch (Exception ex)
             {

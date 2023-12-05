@@ -12,6 +12,7 @@ namespace CondominusApi.Models
         public string NomeDependenteDTO { get; set; }
         public string CpfDependenteDTO { get; set; }
         public string NomePessoaDependenteDTO { get; set; }
+        public string NumeroApartamentoDependenteDTO { get; set; }
     }
 }
 
