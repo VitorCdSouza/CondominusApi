@@ -228,7 +228,7 @@ namespace CondominusApi.Controllers
                 pessoa.NomePessoa = p.NomePessoa;
                 pessoa.TelefonePessoa = p.TelefonePessoa;
                 pessoa.CpfPessoa = p.CpfPessoa;
-                if (p.IdApartamentoPessoa != null)
+                if (p.IdApartamentoPessoa != 0)
                 {
                     pessoa.IdApartamentoPessoa = p.IdApartamentoPessoa;
                 }
@@ -239,7 +239,7 @@ namespace CondominusApi.Controllers
                 attach.Property(x => x.TelefonePessoa).IsModified = true;
                 attach.Property(x => x.TipoPessoa).IsModified = false;
                 attach.Property(x => x.CpfPessoa).IsModified = true;
-                if (p.IdApartamentoPessoa != null)
+                if (p.IdApartamentoPessoa != 0)
                 {
                     attach.Property(x => x.IdApartamentoPessoa).IsModified = true;
                 }

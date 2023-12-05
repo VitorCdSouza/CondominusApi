@@ -42,7 +42,7 @@ namespace CondominusApi.Controllers
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = null,
+                Expires = DateTime.Now.AddYears(1),
                 SigningCredentials = creds
             };
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
@@ -215,7 +215,7 @@ namespace CondominusApi.Controllers
             }
         }
 
-        [HttpPost("DeletarMuitos")]
+        [HttpDelete("DeletarMuitos")]
         public async Task<IActionResult> DeletarUsuarios([FromBody] int[] ids)
         {
             try
@@ -238,7 +238,31 @@ namespace CondominusApi.Controllers
 
                 int linhasAfetadas = await _context.SaveChangesAsync();
 
-                return Ok(linhasAfetadas);
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Usuario> usuariosMoradores = await _context.Usuarios
+                                .Include(x => x.PessoaUsuario)
+                                .ThenInclude(x => x.ApartamentoPessoa)
+                                .ThenInclude(x => x.CondominioApart)
+                                .Where(u => u.PessoaUsuario.TipoPessoa == "Morador")
+                                .Where(x => x.PessoaUsuario.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                                .ToListAsync();
+
+                List<UsuarioDTO> usuariosRetorno = new List<UsuarioDTO>();
+                foreach (Usuario u in usuariosMoradores)
+                {
+                    UsuarioDTO usuarioDTO = new UsuarioDTO
+                    {
+                        Id = u.IdUsuario,
+                        NomeUsuarioDTO = u.PessoaUsuario.NomePessoa,
+                        EmailUsuarioDTO = u.EmailUsuario,
+                        DataAcessoUsuarioDTO = u.DataAcessoUsuario
+                    };
+                    usuariosRetorno.Add(usuarioDTO);
+                }
+
+
+                return Ok(usuariosRetorno);
             }
             catch (Exception ex)
             {

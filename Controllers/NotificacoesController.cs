@@ -125,5 +125,83 @@ namespace CondominusApi.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Update(Notificacao notificacao)
+        {
+            try
+            {
+                Notificacao notificacaoBuscada = await _context.Notificacoes
+                .FirstOrDefaultAsync(x => x.IdNotificacao == notificacao.IdNotificacao);
+
+                if (notificacaoBuscada == null)
+                {
+                    return BadRequest("Notificação não encontrada");
+                }
+
+                notificacaoBuscada.AssuntoNotificacao = notificacao.AssuntoNotificacao;
+                notificacaoBuscada.MensagemNotificacao = notificacao.MensagemNotificacao;
+
+                _context.Notificacoes.Update(notificacaoBuscada);
+                await _context.SaveChangesAsync();
+                return Ok(notificacaoBuscada);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpDelete("DeletarMuitos")]
+        public async Task<IActionResult> DeleteNotificacoes([FromBody] int[] ids)
+        {
+            try
+            {
+                if (ids == null || ids.Length == 0)
+                {
+                    throw new Exception("Selecione notificações para deletar.");
+                }
+
+                // Filtrar apenas IDs válidos e existentes no banco de dados
+                var notificacoesParaDeletar = await _context.Notificacoes
+                    .Where(u => ids.Contains(u.IdNotificacao))
+                    .ToListAsync();
+
+                if (notificacoesParaDeletar.Count == 0)
+                {
+                    return NotFound("Nenhuma notificação encontrada para os IDs fornecidos.");
+                }
+
+                _context.Notificacoes.RemoveRange(notificacoesParaDeletar);
+
+                int linhasAfetadas = await _context.SaveChangesAsync();
+
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Notificacao> avisos = await _context.Notificacoes
+                    .Where(c => c.IdCondominioNotificacao == idCondominioToken)
+                    .Where(p => p.TipoNotificacao == "Aviso")
+                    .ToListAsync();
+
+                List<NotificacaoDTO> notificacoesRetorno = new List<NotificacaoDTO>();
+                foreach (Notificacao x in avisos)
+                {
+                    NotificacaoDTO feedDTO = new NotificacaoDTO
+                    {
+                        Id = x.IdNotificacao,
+                        AssuntoNotificacaoDTO = x.AssuntoNotificacao,
+                        MensagemNotificacaoDTO = x.MensagemNotificacao,
+                        DataEnvioNotificacaoDTO = x.DataEnvioNotificacao
+                    };
+                    notificacoesRetorno.Add(feedDTO);
+                }
+
+                return Ok(notificacoesRetorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

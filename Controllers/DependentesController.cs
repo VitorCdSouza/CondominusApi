@@ -63,7 +63,6 @@ namespace CondominusApi.Controllers
                 .ThenInclude(x => x.ApartamentoPessoa)
                 .ThenInclude(x => x.CondominioApart)
                 .Where(x => x.PessoaDependente.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
-                .Where(x => x.IdPessoaDependente.ToString() == idUsuarioToken)
                 .ToListAsync();
 
                 List<DependenteDTO> dependentesRetorno = new List<DependenteDTO>();
@@ -136,6 +135,95 @@ namespace CondominusApi.Controllers
                 return Ok(novoDependente.PessoaDependente.NomePessoa);
             }
             catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(Dependente dependente)
+        {
+            try
+            {
+                Dependente dp = await _context.Dependentes
+                    .FirstOrDefaultAsync(x => x.IdDependente == dependente.IdDependente);
+
+                if (dp != null)
+                {
+                    if (dependente.NomeDependente != null)
+                    {
+                        dp.NomeDependente = dependente.NomeDependente;
+                    }
+                    if (dependente.CpfDependente != null)
+                    {
+                        dp.CpfDependente = dependente.CpfDependente;
+                    }
+
+                    _context.Dependentes.Update(dp);
+                    await _context.SaveChangesAsync();
+                    return Ok(dp.IdDependente);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeletarMuitos")]
+        public async Task<IActionResult> DeleteDependentes([FromBody] int[] ids)
+        {
+            try
+            {
+                if (ids == null || ids.Length == 0)
+                {
+                    throw new Exception("Selecione dependentes para deletar.");
+                }
+
+                // Filtrar apenas IDs válidos e existentes no banco de dados
+                var dependentesParaDeletar = await _context.Dependentes
+                    .Where(u => ids.Contains(u.IdDependente))
+                    .ToListAsync();
+
+                if (dependentesParaDeletar.Count == 0)
+                {
+                    return NotFound("Nenhum dependente encontrado para os IDs fornecidos.");
+                }
+
+                _context.Dependentes.RemoveRange(dependentesParaDeletar);
+
+                int linhasAfetadas = await _context.SaveChangesAsync();
+
+                // Após deletar as áreas comuns, recupere a lista atualizada
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<Dependente> dependentes = await _context.Dependentes
+                .Include(x => x.PessoaDependente)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.PessoaDependente.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .ToListAsync();
+
+                List<DependenteDTO> dependentesRetorno = new List<DependenteDTO>();
+                foreach (Dependente x in dependentes)
+                {
+                    DependenteDTO dependenteDTO = new DependenteDTO
+                    {
+                        Id = x.IdDependente,
+                        NomeDependenteDTO = x.NomeDependente,
+                        CpfDependenteDTO = x.CpfDependente,
+                        NomePessoaDependenteDTO = x.PessoaDependente.NomePessoa
+                    };
+                    dependentesRetorno.Add(dependenteDTO);
+                }
+
+                return Ok(dependentesRetorno);
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

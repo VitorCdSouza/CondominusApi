@@ -60,11 +60,13 @@ namespace CondominusApi.Controllers
                 {
                     PessoaAreaComumDTO pessoaAreaComumDTO = new PessoaAreaComumDTO
                     {
-                        Id = x.IdPessoaPessArea,
+                        Id = x.IdPessArea,
                         NomeAreaPessAreaDTO = x.AreaComumPessArea.NomeAreaComum,
                         dataHoraInicioPessAreaDTO = x.dataHoraInicioPessArea,
                         dataHoraFimPessAreaDTO = x.dataHoraFimPessArea,
-                        NomePessoaDTO = x.PessoaPessArea.NomePessoa
+                        NomePessoaDTO = x.PessoaPessArea.NomePessoa,
+                        IdPessoaPessAreaDTO = x.IdPessoaPessArea,
+                        IdAreaComumPessAreaDTO = x.IdAreaComumPessArea
                     };
                     pessoasAreasComunsRetorno.Add(pessoaAreaComumDTO);
                 }
@@ -105,7 +107,7 @@ namespace CondominusApi.Controllers
         {
             try
             {
-                PessoaAreaComum reserva = await _context.PessoasAreasComuns.FindAsync(reservaAtualizada.IdPessoaPessArea);
+                PessoaAreaComum reserva = await _context.PessoasAreasComuns.FirstOrDefaultAsync(pac => pac.IdPessoaPessArea == reservaAtualizada.IdPessoaPessArea && pac.IdAreaComumPessArea == reservaAtualizada.IdAreaComumPessArea);
 
                 if (reserva == null)
                     return NotFound("Reserva não encontrada");
@@ -114,8 +116,14 @@ namespace CondominusApi.Controllers
                 reserva.dataHoraInicioPessArea = reservaAtualizada.dataHoraInicioPessArea;
                 reserva.dataHoraFimPessArea = reservaAtualizada.dataHoraFimPessArea;
 
-                _context.PessoasAreasComuns.Update(reserva);
-                await _context.SaveChangesAsync();
+                var attach = _context.Attach(reserva);
+                attach.Property(x => x.IdPessArea).IsModified = false;
+                attach.Property(x => x.dataHoraInicioPessArea).IsModified = true;
+                attach.Property(x => x.dataHoraFimPessArea).IsModified = true;
+                int linhasAfetadas = await _context.SaveChangesAsync(); // confirma a alteração no banco
+
+                // _context.PessoasAreasComuns.Update(reserva);
+                // await _context.SaveChangesAsync();
 
                 return Ok(reserva.IdPessArea);
             }
@@ -149,9 +157,33 @@ namespace CondominusApi.Controllers
 
                 int linhasAfetadas = await _context.SaveChangesAsync();
 
-                // Após deletar as reservas, recupere a lista atualizada de reservas
-                var listaAtualizada = await _context.PessoasAreasComuns.ToListAsync();
-                return Ok(listaAtualizada);
+                string token = HttpContext.Request.Headers["Authorization"].ToString();
+                string idCondominioToken = Criptografia.ObterIdCondominioDoToken(token.Remove(0, 7));
+                List<PessoaAreaComum> pessoasAreasComuns = await _context.PessoasAreasComuns
+                .Include(x => x.AreaComumPessArea)
+                .Include(x => x.PessoaPessArea)
+                .ThenInclude(x => x.ApartamentoPessoa)
+                .ThenInclude(x => x.CondominioApart)
+                .Where(x => x.PessoaPessArea.ApartamentoPessoa.CondominioApart.IdCond.ToString() == idCondominioToken)
+                .ToListAsync();
+
+                List<PessoaAreaComumDTO> pessoasAreasComunsRetorno = new List<PessoaAreaComumDTO>();
+                foreach (PessoaAreaComum x in pessoasAreasComuns)
+                {
+                    PessoaAreaComumDTO pessoaAreaComumDTO = new PessoaAreaComumDTO
+                    {
+                        Id = x.IdPessArea,
+                        NomeAreaPessAreaDTO = x.AreaComumPessArea.NomeAreaComum,
+                        dataHoraInicioPessAreaDTO = x.dataHoraInicioPessArea,
+                        dataHoraFimPessAreaDTO = x.dataHoraFimPessArea,
+                        NomePessoaDTO = x.PessoaPessArea.NomePessoa,
+                        IdPessoaPessAreaDTO = x.IdPessoaPessArea,
+                        IdAreaComumPessAreaDTO = x.IdAreaComumPessArea
+                    };
+                    pessoasAreasComunsRetorno.Add(pessoaAreaComumDTO);
+                }
+
+                return Ok(pessoasAreasComunsRetorno);
             }
             catch (Exception ex)
             {
