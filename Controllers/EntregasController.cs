@@ -87,7 +87,7 @@ namespace CondominusApi.Controllers
                 .Include(x => x.ApartamentoEnt)
                 .ThenInclude(x => x.CondominioApart)
                 .Where(x => x.ApartamentoEnt.CondominioApart.IdCond.ToString() == idCondominioToken)
-                .Where(x => x.ApartamentoEnt.PessoasApart.Any(x => x.IdPessoa == pessoa.IdPessoa))
+                .Where(x => x.ApartamentoEnt.PessoasApart.Any(x => x.IdApartamentoPessoa == pessoa.IdApartamentoPessoa))
                 .ToListAsync();
 
                 List<EntregaDTO> entregasRetorno = new List<EntregaDTO>();
