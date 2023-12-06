@@ -102,6 +102,52 @@ namespace CondominusApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        public class CustomReserva
+
+        {
+            public DateTime data { get; set; }
+            public DateTime horaInicio { get; set; } // data e hora do inicio de area comum
+            public DateTime horaFim { get; set; } // data e hora do fim de area comum
+            public Pessoa PessoaPessArea { get; set; }
+            public int IdPessoaPessArea { get; set; }
+            public string nomeAreaComum { get; set; }
+        }
+
+        [HttpPost("CriarReserva")]
+        public async Task<IActionResult> Add(CustomReserva novaReserva)
+        {
+            try
+            {
+                AreaComum ac = await _context.AreasComuns
+                    .FirstOrDefaultAsync(x => x.NomeAreaComum == novaReserva.nomeAreaComum);
+
+                Pessoa p = await _context.Pessoas
+                    .FirstOrDefaultAsync(x => x.IdPessoa == novaReserva.IdPessoaPessArea);
+
+                DateTime dataHoraInicioCombinadas = novaReserva.data.Date + novaReserva.horaInicio.TimeOfDay;
+                DateTime dataHoraFimCombinadas = novaReserva.data.Date + novaReserva.horaFim.TimeOfDay;
+
+                PessoaAreaComum r = new PessoaAreaComum
+                {
+                    dataHoraInicioPessArea = dataHoraInicioCombinadas,
+                    dataHoraFimPessArea = dataHoraFimCombinadas,
+                    IdAreaComumPessArea = ac.IdAreaComum,
+                    AreaComumPessArea = ac,
+                    IdPessoaPessArea = p.IdPessoa,
+                    PessoaPessArea = p
+                };
+
+                await _context.PessoasAreasComuns.AddAsync(r);
+                await _context.SaveChangesAsync();
+
+                return Ok(r);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPut]
         public async Task<IActionResult> Update(PessoaAreaComum reservaAtualizada)
         {
